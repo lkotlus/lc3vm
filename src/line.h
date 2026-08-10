@@ -2,25 +2,41 @@
 #define OPERAND_H
 
 #include <stdint.h>
-#include "main.h"
+#include "constants.h"
 
 // Operands
 typedef enum {
-    OPERAND_IVAL,
-    OPERAND_ADDR,
-    OPERAND_LABEL,
-    OPERAND_REG
+    IVAL_OPERAND,
+    LABEL_OPERAND,
+    REG_OPERAND,
+    INVALID_OPERAND
 } OperandType;
+
+typedef enum {
+    R0, R1, R2, R3,
+    R4, R5, R6, R7
+} Register;
 
 typedef struct {
     OperandType type;
     union {
         int16_t ival;
-        uint16_t addr;
+        Register reg;
         char label[STRLEN];
-        uint8_t reg;
     } operand;
 } Operand;
+
+typedef struct {
+    const char* token;
+    Register reg;
+} RegisterMap;
+
+static const RegisterMap reg_map[] = {
+    {"R0", R0}, {"R1", R1}, {"R2", R2}, {"R3", R3},
+    {"R4", R4}, {"R5", R5}, {"R6", R6}, {"R7", R7}
+};
+
+OperandType parse_operand(const char* token, Operand* operand);
 
 // Operations
 //
@@ -31,16 +47,44 @@ typedef enum {
     ADD, AND, NOT, LD,
     LDI, LDR, LEA, ST,
     STR, STI, BR, JSR,
-    JSRR, JMP, RTI, TRAP
+    JSRR, JMP, RTI, TRAP,
+    INVALID_OPCODE
 } OperationCode;
+
+typedef struct {
+    const char* token;
+    OperationCode opcode;
+} OperationCodeMap;
+
+static const OperationCodeMap opcode_map[] = {
+    {"ADD", ADD}, {"AND", AND}, {"NOT", NOT}, {"LD", LD},
+    {"LDI", LDI}, {"LDR", LDR}, {"LEA", LEA}, {"ST", ST},
+    {"STR", STR}, {"STI", STI}, {"BR", BR}, {"JSR", JSR},
+    {"JSRR", JSRR}, {"JMP", JMP}, {"RTI", RTI}, {"TRAP", TRAP},
+};
 
 typedef struct {
     Operand operands[3];
     OperationCode opcode;
 } Operation;
 
+OperationCode parse_operation(const char* token, Operation* operation);
+
 // Directives
-typedef enum { ORIG, END, FILL, BLKW, STRINGZ } DirectiveType;
+typedef enum { ORIG, END, FILL, BLKW, STRINGZ, INVALID_DIRECTIVE } DirectiveType;
+
+typedef struct {
+    const char* token;
+    DirectiveType directive;
+} DirectiveMap;
+
+static const DirectiveMap directive_map[] = {
+    {".ORIG", ORIG}, 
+    {".END", END}, 
+    {".FILL", FILL}, 
+    {".BLKW", BLKW},
+    {".STRINGZ", STRINGZ}
+};
 
 typedef struct {
     DirectiveType type;
@@ -51,6 +95,8 @@ typedef struct {
         char stringz[STRLEN];
     } value;
 } Directive;
+
+DirectiveType parse_directive(const char* token, Directive* directive);
 
 // Lines
 typedef enum {

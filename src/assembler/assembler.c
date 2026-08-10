@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
-#include "../main.h"
+#include "../constants.h"
 
 char get_token(FILE* file, char* token) {
     int ch;
@@ -22,6 +22,8 @@ char get_token(FILE* file, char* token) {
 
     return 1;
 }
+
+char get_line(FILE* file);
 
 void loop(char* fpath) {
     FILE* file = fopen(fpath, "r");
