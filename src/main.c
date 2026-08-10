@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "main.h"
+#include "assembler/assembler.h"
 
 int main(int argv, char* args[]) {
     CliFlags* flags = parse_cliflags(argv, args);
@@ -13,6 +14,7 @@ int main(int argv, char* args[]) {
     }
     else if (flags->assemble) {
         printf("Assembling %s...\n", flags->inpath);
+        loop(flags->inpath);
         printf("Assembled code located in %s\n", flags->outpath);
     }
     else if (flags->disassemble) {
