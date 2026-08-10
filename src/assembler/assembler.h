@@ -1,6 +1,6 @@
 #ifndef ASSEMBLER
 #define ASSEMBLER
 
-void loop(char* fpath);
+void loop(const char* fpath);
 
 #endif

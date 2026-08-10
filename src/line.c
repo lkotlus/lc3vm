@@ -13,7 +13,7 @@ OperandType parse_operand(const char* token, Operand* operand) {
         return _parse_operand_ival(token, operand);
     }
 
-    for (int i = 0; i < sizeof(reg_map) / sizeof(reg_map[0]); i++) {
+    for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); i++) {
         if (strcmp(token, reg_map[i].token) == 0) {
             return _parse_operand_reg(reg_map[i].reg, operand);
         }
@@ -35,7 +35,12 @@ OperandType _parse_operand_ival(const char* token, Operand* operand) {
     operand->type = IVAL_OPERAND;
 
     if (token[0] == '#') {
-        int i = 1;
+        // Special case for negative numbers
+        if (!((token[1] > 47 && token[1] < 58) || token[1] == '-')) {
+            return INVALID_OPERAND;
+        }
+
+        int i = 2;
         char c = token[i];
 
         while (c != '\0') {
@@ -48,8 +53,8 @@ OperandType _parse_operand_ival(const char* token, Operand* operand) {
 
         operand->operand.ival = (int16_t)strtol(++token, NULL, 10);
     }
-    else {
-        int i = 1;
+    else if (token[0] == '0' && token[1] == 'X') {
+        int i = 2;
         char c = token[i];
 
         while (c != '\0') {
@@ -85,6 +90,7 @@ OperandType _parse_operand_label(const char* token, Operand* operand) {
         if (!((c > 47 && c < 58) || (c > 64 && c < 91))) {
             return INVALID_OPERAND;
         }
+        c = token[++i];
     }
 
     strncpy(operand->operand.label, token, STRLEN);
