@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
-#include "../constants.h"
+#include "constants.h"
 
 char get_token(FILE* file, char* token) {
     int ch;
