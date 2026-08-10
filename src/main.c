@@ -5,7 +5,7 @@
 #include "main.h"
 
 int main(int argv, char* args[]) {
-    cliflags* flags = parse_cliflags(argv, args);
+    CliFlags* flags = parse_cliflags(argv, args);
 
     if (flags->help) {
         print_help();
@@ -26,8 +26,8 @@ int main(int argv, char* args[]) {
     return 0;
 }
 
-cliflags* cliflags_create() {
-    cliflags* flags = (cliflags*)malloc(sizeof(cliflags));
+CliFlags* cliflags_create() {
+    CliFlags* flags = (CliFlags*)malloc(sizeof(CliFlags));
 
     flags->assemble = 0;
     flags->disassemble = 0;
@@ -37,8 +37,8 @@ cliflags* cliflags_create() {
     return flags;
 }
 
-cliflags* parse_cliflags(int argv, char* args[]) {
-    cliflags* flags = cliflags_create();
+CliFlags* parse_cliflags(int argv, char* args[]) {
+    CliFlags* flags = cliflags_create();
 
     if (argv < 2) {
         printf("You must provide at least one command line argument.\n\n");

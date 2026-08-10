@@ -1,10 +1,10 @@
-#if !defined (cliflags)
+#if !defined (CliFlags)
 
 #define STRLEN 255
 
-typedef struct cliflags cliflags;
+typedef struct CliFlags CliFlags;
 
-struct cliflags {
+struct CliFlags {
     char assemble;
     char disassemble;
     char run;
@@ -13,8 +13,8 @@ struct cliflags {
     char outpath[STRLEN];
 };
 
-cliflags* cliflags_create();
-cliflags* parse_cliflags(int argv, char* args[]);
+CliFlags* cliflags_create();
+CliFlags* parse_cliflags(int argv, char* args[]);
 void validate_path(const char* path);
 void print_help();
 
