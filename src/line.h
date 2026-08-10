@@ -11,6 +11,7 @@ typedef enum {
     OPERAND_LABEL,
     OPERAND_REG
 } OperandType;
+
 typedef struct {
     OperandType type;
     union {
@@ -32,6 +33,7 @@ typedef enum {
     STR, STI, BR, JSR,
     JSRR, JMP, RTI, TRAP
 } OperationCode;
+
 typedef struct {
     Operand operands[3];
     OperationCode opcode;
@@ -39,6 +41,7 @@ typedef struct {
 
 // Directives
 typedef enum { ORIG, END, FILL, BLKW, STRINGZ } DirectiveType;
+
 typedef struct {
     DirectiveType type;
     union {
@@ -54,6 +57,7 @@ typedef enum {
     OPERATION,
     DIRECTIVE
 } LineType;
+
 typedef struct {
     uint16_t addr;
     LineType type;
