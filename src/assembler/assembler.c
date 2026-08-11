@@ -1,13 +1,36 @@
-#include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 #include "constants.h"
 #include "line.h"
 
+// Gets next token from a line.
+int get_token(char** line, char* token) {
+    int i = 0;
+
+    while (**line != '\0') {
+        while (!isspace(**line) && **line != ',') {
+            token[i++] = *(*line)++;
+        }
+        if (i > 0) {
+            token[i] = '\0';
+            return 1;
+        }
+
+        (*line)++;
+    }
+
+    token[i] = '\0';
+    return 0;
+}
+
+int parse_token(char* token) {
+    return 0;
+}
+
 // Gets the next line in file that contains actual tokens.
 // Only stores from the first token to the end of the line
 // or the start of a comment.
-int get_fline(FILE* file, char* line) {
+int get_line(FILE* file, char* line) {
     int ch;
     int i = 0;
 
@@ -38,23 +61,19 @@ int get_fline(FILE* file, char* line) {
     return 1;
 }
 
-// Gets next token from a line.
-int get_token(char** line, char* token) {
-    int i = 0;
+int parse_line(FILE* file, Line* line) {
+    int ntok = 0;
+    char linestr[STRLEN];
 
-    while (**line != '\0') {
-        while (!isspace(**line) && **line != ',') {
-            token[i++] = *(*line)++;
-        }
-        if (i > 0) {
-            token[i] = '\0';
-            return 1;
-        }
+    if (get_line(file, linestr)) {
+        char token[STRLEN];
+        char* p = linestr;
+        while (get_token(&p, token)) {
+            ntok++;
+        };
 
-        (*line)++;
+        return ntok;
     }
-
-    token[i] = '\0';
     return 0;
 }
 
@@ -62,7 +81,7 @@ void loop(const char* fpath) {
     FILE* file = fopen(fpath, "r");
 
     char line[STRLEN];
-    while (get_fline(file, line)) {
+    while (get_line(file, line)) {
         printf("%s\n", line);
 
         char token[STRLEN];
