@@ -7,9 +7,9 @@
 typedef enum {
     LABEL_VALID,
     LABEL_INVALID
-} LabelResults;
+} LabelResult;
 
-LabelResults parse_label(const char* token);
+LabelResult parse_label(const char* token);
 
 // Operands
 typedef enum {
@@ -92,6 +92,6 @@ static const DirectiveMap directive_map[] = {
     {".STRINGZ", STRINGZ}
 };
 
-DirectiveType parse_directivetype(const char* token);
+DirectiveType parse_directive(const char* token);
 
 #endif

@@ -14,7 +14,7 @@ static Operand* _parse_operand_ival(const char* token, int is_dec);
 static Operand* _parse_operand_reg(Register reg);
 static Operand* _parse_operand_label(const char* token);
 
-LabelResults parse_label(const char* token) {
+LabelResult parse_label(const char* token) {
     if (_validate_label(token)) return LABEL_VALID;
 
     return LABEL_INVALID;
@@ -46,7 +46,7 @@ OperationCode parse_opcode(const char* token) {
     return OPCODE_INVALID;
 }
 
-DirectiveType parse_directivetype(const char* token) {
+DirectiveType parse_directive(const char* token) {
     DirectiveType directive;
     if (_is_directive(token, &directive)) {
         return directive;

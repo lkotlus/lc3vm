@@ -23,12 +23,21 @@ typedef struct {
 
 // Lines
 typedef enum {
+    LINE_ERR_NONE,
+    LINE_ERR_INVALID_FIRST_TOKEN,
+    LINE_ERR_TOO_MANY_OPERANDS,
+    LINE_ERR_TOO_FEW_OPERANDS
+} LineErr;
+
+typedef enum {
     OPERATION,
     DIRECTIVE
 } LineType;
 
 typedef struct {
+    LineErr err;
     uint16_t addr;
+    char label[STRLEN];
     LineType type;
     union {
         Directive directive;

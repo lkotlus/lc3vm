@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 #include "constants.h"
 #include "assembler/token.h"
 #include "assembler/line.h"
@@ -9,9 +10,12 @@
 static int _get_fline(FILE* f, char* line);
 static void _skip_comment(FILE* f, int* ch);
 static int _get_token(char** line, char* token);
+static Operation* _get_operation(const char* token, OperationCode opcode);
+static Directive* _get_directive(const char* token, DirectiveType dirtype);
 
 Line* parse_line(FILE* f) {
     Line* line = (Line*)malloc(sizeof(Line));
+    line->err = LINE_ERR_NONE;
     char fline[STRLEN];
 
     if (!_get_fline(f, fline)) {
@@ -21,11 +25,44 @@ Line* parse_line(FILE* f) {
     printf("%s\n", fline);
 
     char token[STRLEN];
-    char* p = fline;
-    while(_get_token(&p, token)) {
-        LabelResults label = parse_label(token);
+    char* fl = fline;
+
+
+    // Logic for parsing a line:
+    // 1. Check for Label
+    // 2. Differentiate between Directive and Operation
+    // 3. Get operands and verify token count
+    
+    // 1 Get first token
+    _get_token(&fl, token);
+
+    // 2 Check for label
+    if (parse_label(token) == LABEL_VALID) {
+        strncpy(line->label, token, STRLEN-1);
+        line->label[STRLEN - 1] = '\0';
+
+        // 2.5 Get next token if a label is there
+        _get_token(&fl, token);
+    }
+
+    // 3 Differentiate between Directive and Operation
+    OperationCode opcode = parse_opcode(token);
+    DirectiveType dirtype = parse_directive(token);
+    if (opcode != OPCODE_INVALID) {
+       Operation* op = _get_operation(token, opcode);
+    }
+    else if (dirtype != DIRECTIVE_INVALID) {
+        Directive* dir = _get_directive(token, dirtype);
+    }
+    else {
+        line->err = LINE_ERR_INVALID_FIRST_TOKEN;
+        return line;
+    }
+
+    while(_get_token(&fl, token)) {
+        LabelResult label = parse_label(token);
         OperationCode opcode = parse_opcode(token);
-        DirectiveType directivetype = parse_directivetype(token);
+        DirectiveType directivetype = parse_directive(token);
         Operand* operand = parse_operand(token);
 
         if (label != LABEL_INVALID) {
@@ -94,4 +131,18 @@ static int _get_token(char** fline, char* token) {
 
     token[i] = '\0';
     return 0;
+}
+
+static Operation* _get_operation(const char* token, OperationCode opcode) {
+    Operation* op = (Operation*)malloc(sizeof(Operation));
+    op->opcode = opcode;
+
+    return op;
+}
+
+static Directive* _get_directive(const char* token, DirectiveType dirtype) {
+    Directive* dir = (Directive*)malloc(sizeof(Directive));
+    dir->type = dirtype;
+
+    return dir;
 }
