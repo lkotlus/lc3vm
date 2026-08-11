@@ -70,7 +70,7 @@ typedef struct {
     OperationCode opcode;
 } Operation;
 
-OperationCode parse_operation(const char* token, Operation* operation);
+OperationCode parse_opcode(const char* token);
 
 // Directives
 typedef enum { ORIG, END, FILL, BLKW, STRINGZ, INVALID_DIRECTIVE } DirectiveType;
@@ -98,7 +98,7 @@ typedef struct {
     } value;
 } Directive;
 
-DirectiveType parse_directive(const char* token, Directive* directive);
+DirectiveType parse_directivetype(const char* token);
 
 // Lines
 typedef enum {

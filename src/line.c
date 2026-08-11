@@ -41,14 +41,23 @@ OperandType parse_operand(const char* token, Operand* operand) {
     return _parse_operand_label(token, operand);
 }
 
-OperationCode parse_operation(const char* token, Operation* operation) {
+OperationCode parse_opcode(const char* token) {
+    OperationCode opcode;
+    if (_is_opcode(token, &opcode)) {
+        return opcode;
+    }
+
     return INVALID_OPCODE;
 }
 
-DirectiveType parse_directive(const char* token, Directive* directive) {
+DirectiveType parse_directivetype(const char* token) {
+    DirectiveType directive;
+    if (_is_directive(token, &directive)) {
+        return directive;
+    }
+
     return INVALID_DIRECTIVE;
 }
-
 
 int _validate_label(const char* token) {
     if (_is_hex(token)) {
