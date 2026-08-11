@@ -81,7 +81,7 @@ static int _get_token(char** fline, char* token) {
     int i = 0;
 
     while (**fline != '\0') {
-        while (!isspace(**fline) && **fline != ',') {
+        while (!isspace(**fline) && **fline != ',' && **fline != '\0') {
             token[i++] = *(*fline)++;
         }
         if (i > 0) {
