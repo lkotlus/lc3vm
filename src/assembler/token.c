@@ -4,27 +4,22 @@
 #include "assembler/token.h"
 #include "constants.h"
 
-int _validate_label(const char* token);
-int _is_hex(const char* token);
-int _is_register(const char* token, Register* reg);
-int _is_opcode(const char* token, OperationCode* opcode);
-int _is_directive(const char* token, DirectiveType* directive);
-OperandType _parse_operand_ival(const char* token, Operand* operand);
-OperandType _parse_operand_reg(Register reg, Operand* operand);
-OperandType _parse_operand_label(const char* token, Operand* operand);
+static int _validate_label(const char* token);
+static int _is_hex(const char* token);
+static int _is_register(const char* token, Register* reg);
+static int _is_opcode(const char* token, OperationCode* opcode);
+static int _is_directive(const char* token, DirectiveType* directive);
+static OperandType _parse_operand_ival(const char* token, Operand* operand);
+static OperandType _parse_operand_reg(Register reg, Operand* operand);
+static OperandType _parse_operand_label(const char* token, Operand* operand);
 
-// Returns 1 if you have a register.
-// Returns 2 if you have an opcode.
-// Returns 3 if you have a directive.
-// Returns -1 if you have an invalid label name.
-// Returns 0 if you have a label.
-int parse_label(const char* token) {
-    if (_is_register(token, NULL)) return 1;
-    if (_is_opcode(token, NULL)) return 2;
-    if (_is_directive(token, NULL)) return 3;
-    if (!_validate_label(token)) return -1;
+LabelResults parse_label(const char* token) {
+    if (_is_register(token, NULL)) return LABEL_INVALID_REGISTER;
+    if (_is_opcode(token, NULL)) return LABEL_INVALID_OPCODE;
+    if (_is_directive(token, NULL)) return LABEL_INVALID_DIRECTIVE;
+    if (!_validate_label(token)) return LABEL_INVALID;
 
-    return 0;
+    return LABEL_VALID;
 }
 
 OperandType parse_operand(const char* token, Operand* operand) {
@@ -59,21 +54,20 @@ DirectiveType parse_directivetype(const char* token) {
     return INVALID_DIRECTIVE;
 }
 
-int _validate_label(const char* token) {
+static int _validate_label(const char* token) {
     if (_is_hex(token)) {
         return 0;
     }
 
     // The first character must be [A-Z]
-    if (!(token[0] > 64 && token[0] < 91)) {
+    if (!(token[0] >= 'A' && token[0] <= 'Z')) {
         return 0;
     }
 
     int i = 1;
     char c = token[i];
     while (c != '\0') {
-        // All other characters must be [A-Z0-9]
-        if (!((c > 47 && c < 58) || (c > 64 && c < 91))) {
+        if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z'))) {
             return 0;
         }
         c = token[++i];
@@ -82,19 +76,19 @@ int _validate_label(const char* token) {
     return 1;
 }
 
-int _is_dec(const char* token) {
+static int _is_dec(const char* token) {
     if (token[0] == '#') {
         int i = 2;
         char c = token[i];
 
         // Special case for negative numbers
-        if (!((token[1] > 47 && token[1] < 58) || token[1] == '-')) {
+        if (!((token[1] >= '0' && token[1] <= '9') || ((token[1] == '-') && token[2] != '\0'))) {
             return 0;
         }
 
         while (c != '\0') {
             // Valid decimal digits [0-9]
-            if (!(c > 47 && c < 58)) {
+            if (!(c >= '0' && c <= '9')) {
                 return 0;
             }
             c = token[++i];
@@ -106,14 +100,14 @@ int _is_dec(const char* token) {
     return 0;
 }
 
-int _is_hex(const char* token) {
+static int _is_hex(const char* token) {
     if (token[0] == 'X' || (token[0] == '0' && token[1] == 'X')) {
         int i = token[0] == 'X' ? 1 : 2;
         char c = token[i];
 
         while (c != '\0') {
             // Valid hex digits [0-9A-F]
-            if (!((c > 47 && c < 58) || (c > 64 && c < 71))) {
+            if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F'))) {
                 return 0;
             }
             c = token[++i];
@@ -125,7 +119,7 @@ int _is_hex(const char* token) {
     return 0;
 }
 
-int _is_register(const char* token, Register* reg) {
+static int _is_register(const char* token, Register* reg) {
     for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); i++) {
         if (strcmp(token, reg_map[i].token) == 0) {
             if (reg) *reg = reg_map[i].reg;
@@ -136,7 +130,7 @@ int _is_register(const char* token, Register* reg) {
     return 0;
 }
 
-int _is_opcode(const char* token, OperationCode* opcode) {
+static int _is_opcode(const char* token, OperationCode* opcode) {
     for (int i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); i++) {
         if (strcmp(token, opcode_map[i].token) == 0) {
             if (opcode) *opcode = opcode_map[i].opcode;
@@ -147,7 +141,7 @@ int _is_opcode(const char* token, OperationCode* opcode) {
     return 0;
 }
 
-int _is_directive(const char* token, DirectiveType* directive) {
+static int _is_directive(const char* token, DirectiveType* directive) {
     for (int i = 0; i < (int)(sizeof(directive_map) / sizeof(directive_map[0])); i++) {
         if (strcmp(token, directive_map[i].token) == 0) {
             if (directive) *directive = directive_map[i].directive;
@@ -158,7 +152,7 @@ int _is_directive(const char* token, DirectiveType* directive) {
     return 0;
 }
 
-OperandType _parse_operand_ival(const char* token, Operand* operand) {
+static OperandType _parse_operand_ival(const char* token, Operand* operand) {
     operand->type = IVAL_OPERAND;
 
     if (_is_dec(token)) {
@@ -172,14 +166,14 @@ OperandType _parse_operand_ival(const char* token, Operand* operand) {
     return IVAL_OPERAND;
 }
 
-OperandType _parse_operand_reg(Register reg, Operand* operand) {
+static OperandType _parse_operand_reg(Register reg, Operand* operand) {
     operand->type = REG_OPERAND;
     operand->operand.reg = reg;
 
     return REG_OPERAND;
 }
 
-OperandType _parse_operand_label(const char* token, Operand* operand) {
+static OperandType _parse_operand_label(const char* token, Operand* operand) {
     operand->type = LABEL_OPERAND;
 
     if (!_validate_label(token)) {

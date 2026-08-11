@@ -4,7 +4,15 @@
 #include <stdint.h>
 #include "constants.h"
 
-int parse_label(const char* token);
+typedef enum {
+    LABEL_VALID,
+    LABEL_INVALID,
+    LABEL_INVALID_REGISTER,
+    LABEL_INVALID_OPCODE,
+    LABEL_INVALID_DIRECTIVE
+} LabelResults;
+
+LabelResults parse_label(const char* token);
 
 // Operands
 typedef enum {
