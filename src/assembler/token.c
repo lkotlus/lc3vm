@@ -5,11 +5,12 @@
 #include "constants.h"
 
 static int _validate_label(const char* token);
+static int _is_dec(const char* token);
 static int _is_hex(const char* token);
 static int _is_register(const char* token, Register* reg);
 static int _is_opcode(const char* token, OperationCode* opcode);
 static int _is_directive(const char* token, DirectiveType* directive);
-static OperandType _parse_operand_ival(const char* token, Operand* operand);
+static OperandType _parse_operand_ival(const char* token, int is_dec, Operand* operand);
 static OperandType _parse_operand_reg(Register reg, Operand* operand);
 static OperandType _parse_operand_label(const char* token, Operand* operand);
 
@@ -23,8 +24,11 @@ LabelResults parse_label(const char* token) {
 }
 
 OperandType parse_operand(const char* token, Operand* operand) {
-    if (token[0] == '#' || token[0] == '0') {
-        return _parse_operand_ival(token, operand);
+    if (_is_dec(token)) {
+        return _parse_operand_ival(token, 1, operand);
+    }
+    else if (_is_hex(token)) {
+        return _parse_operand_ival(token, 0, operand);
     }
 
     for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); i++) {
@@ -152,13 +156,13 @@ static int _is_directive(const char* token, DirectiveType* directive) {
     return 0;
 }
 
-static OperandType _parse_operand_ival(const char* token, Operand* operand) {
+static OperandType _parse_operand_ival(const char* token, int is_dec, Operand* operand) {
     operand->type = IVAL_OPERAND;
 
-    if (_is_dec(token)) {
+    if (is_dec) {
         operand->operand.ival = (int16_t)strtol(++token, NULL, 10);
     }
-    else if (_is_hex(token)) {
+    else {
         token += token[0] == 'X' ? 1 : 2;
         operand->operand.ival = (int16_t)strtol(token, NULL, 16);
     }
@@ -180,7 +184,8 @@ static OperandType _parse_operand_label(const char* token, Operand* operand) {
         return INVALID_OPERAND;
     }
 
-    strncpy(operand->operand.label, token, STRLEN);
+    strncpy(operand->operand.label, token, STRLEN-1);
+    operand->operand.label[STRLEN - 1] = '\0';
 
     return LABEL_OPERAND;
 }
