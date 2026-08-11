@@ -50,7 +50,8 @@ typedef enum {
     LDI, LDR, LEA, ST,
     STR, STI, BR, JSR,
     JSRR, JMP, RTI, TRAP,
-    INVALID_OPCODE
+    GETC, OUT, PUTS, IN,
+    PUTSP, HALT, INVALID_OPCODE
 } OperationCode;
 
 typedef struct {
@@ -63,6 +64,8 @@ static const OperationCodeMap opcode_map[] = {
     {"LDI", LDI}, {"LDR", LDR}, {"LEA", LEA}, {"ST", ST},
     {"STR", STR}, {"STI", STI}, {"BR", BR}, {"JSR", JSR},
     {"JSRR", JSRR}, {"JMP", JMP}, {"RTI", RTI}, {"TRAP", TRAP},
+    {"GETC", GETC}, {"OUT", OUT}, {"PUTS", PUTS}, {"IN", IN},
+    {"PUTSP", PUTSP}, {"HALT", HALT}
 };
 
 typedef struct {
