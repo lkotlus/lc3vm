@@ -47,7 +47,7 @@ Line* parse_line(FILE* f) {
 
     // 3 Differentiate between Directive and Operation
     OperationCode opcode = parse_opcode(token);
-    DirectiveType dirtype = parse_directive(token);
+    DirectiveType dirtype = parse_directivetype(token);
     if (opcode != OPCODE_INVALID) {
        Operation* op = _get_operation(token, opcode);
     }
@@ -62,7 +62,7 @@ Line* parse_line(FILE* f) {
     while(_get_token(&fl, token)) {
         LabelResult label = parse_label(token);
         OperationCode opcode = parse_opcode(token);
-        DirectiveType directivetype = parse_directive(token);
+        DirectiveType directivetype = parse_directivetype(token);
         Operand* operand = parse_operand(token);
 
         if (label != LABEL_INVALID) {

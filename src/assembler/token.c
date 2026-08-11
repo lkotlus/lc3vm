@@ -46,7 +46,7 @@ OperationCode parse_opcode(const char* token) {
     return OPCODE_INVALID;
 }
 
-DirectiveType parse_directive(const char* token) {
+DirectiveType parse_directivetype(const char* token) {
     DirectiveType directive;
     if (_is_directive(token, &directive)) {
         return directive;

@@ -82,9 +82,9 @@ typedef enum { ORIG, END, FILL, BLKW, STRINGZ, DIRECTIVE_INVALID } DirectiveType
 typedef struct {
     const char* token;
     DirectiveType directive;
-} DirectiveMap;
+} DirectiveTypeMap;
 
-static const DirectiveMap directive_map[] = {
+static const DirectiveTypeMap directive_map[] = {
     {".ORIG", ORIG}, 
     {".END", END}, 
     {".FILL", FILL}, 
@@ -92,6 +92,6 @@ static const DirectiveMap directive_map[] = {
     {".STRINGZ", STRINGZ}
 };
 
-DirectiveType parse_directive(const char* token);
+DirectiveType parse_directivetype(const char* token);
 
 #endif
