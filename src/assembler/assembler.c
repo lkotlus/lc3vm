@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "constants.h"
-#include "line.h"
+#include "assembler/token.h"
+#include "assembler/line.h"
 
 // Gets next token from a line.
 int get_token(char** line, char* token) {

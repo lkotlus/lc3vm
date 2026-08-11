@@ -1,5 +1,5 @@
-#ifndef OPERAND_H
-#define OPERAND_H
+#ifndef TOKEN
+#define TOKEN
 
 #include <stdint.h>
 #include "constants.h"
@@ -68,11 +68,6 @@ static const OperationCodeMap opcode_map[] = {
     {"PUTSP", PUTSP}, {"HALT", HALT}
 };
 
-typedef struct {
-    Operand operands[3];
-    OperationCode opcode;
-} Operation;
-
 OperationCode parse_opcode(const char* token);
 
 // Directives
@@ -91,31 +86,6 @@ static const DirectiveMap directive_map[] = {
     {".STRINGZ", STRINGZ}
 };
 
-typedef struct {
-    DirectiveType type;
-    union {
-        uint16_t orig_addr;
-        Operand fill_value;
-        uint16_t blkw_count;
-        char stringz[STRLEN];
-    } value;
-} Directive;
-
 DirectiveType parse_directivetype(const char* token);
-
-// Lines
-typedef enum {
-    OPERATION,
-    DIRECTIVE
-} LineType;
-
-typedef struct {
-    uint16_t addr;
-    LineType type;
-    union {
-        Directive directive;
-        Operation operation;
-    } line;
-} Line;
 
 #endif

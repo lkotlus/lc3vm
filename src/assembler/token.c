@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "line.h"
+#include "assembler/token.h"
 #include "constants.h"
 
 int _validate_label(const char* token);
