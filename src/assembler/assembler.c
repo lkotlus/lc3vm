@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 #include "constants.h"
@@ -81,14 +82,25 @@ void loop(const char* fpath) {
     FILE* file = fopen(fpath, "r");
 
     char line[STRLEN];
+    Operand* o = (Operand*)malloc(sizeof(Operand));
     while (get_line(file, line)) {
         printf("%s\n", line);
 
         char token[STRLEN];
         char* p = line; // We need a pointer...
         while(get_token(&p, token)) {
-            int l = parse_label(token);
-            printf("\t%d: %s\n", l, token);
+            if (parse_label(token) == 0) {
+                printf("\tLabel: %s\n", token);
+            }
+            else if (parse_opcode(token) != INVALID_OPCODE) {
+                printf("\tOpcode: %s\n", token);
+            }
+            else if (parse_directivetype(token) != INVALID_DIRECTIVE) {
+                printf("\tDirective: %s\n", token);
+            }
+            else if (parse_operand(token, o) != INVALID_OPERAND) {
+                printf("\tOperand: %s\n", token);
+            } 
         };
     }
 
