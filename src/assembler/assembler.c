@@ -87,7 +87,8 @@ void loop(const char* fpath) {
         char token[STRLEN];
         char* p = line; // We need a pointer...
         while(get_token(&p, token)) {
-            printf("\t%s\n", token);
+            int l = parse_label(token);
+            printf("\t%d: %s\n", l, token);
         };
     }
 

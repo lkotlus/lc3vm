@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include "constants.h"
 
+int parse_label(const char* token);
+
 // Operands
 typedef enum {
     IVAL_OPERAND,
