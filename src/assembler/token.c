@@ -136,7 +136,7 @@ static int _is_register(const char* token, Register* reg) {
 
 static int _is_opcode(const char* token, OperationCode* opcode) {
     for (int i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); i++) {
-        if (strcmp(token, opcode_map[i].token) == 0) {
+        if (strncmp(token, opcode_map[i].token, opcode_map[i].n) == 0) {
             if (opcode) *opcode = opcode_map[i].opcode;
             return 1;
         }

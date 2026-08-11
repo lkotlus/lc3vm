@@ -65,15 +65,16 @@ typedef enum {
 typedef struct {
     const char* token;
     OperationCode opcode;
+    int n;
 } OperationCodeMap;
 
 static const OperationCodeMap opcode_map[] = {
-    {"ADD", ADD}, {"AND", AND}, {"NOT", NOT}, {"LD", LD},
-    {"LDI", LDI}, {"LDR", LDR}, {"LEA", LEA}, {"ST", ST},
-    {"STR", STR}, {"STI", STI}, {"BR", BR}, {"JSR", JSR},
-    {"JSRR", JSRR}, {"JMP", JMP}, {"RTI", RTI}, {"TRAP", TRAP},
-    {"GETC", GETC}, {"OUT", OUT}, {"PUTS", PUTS}, {"IN", IN},
-    {"PUTSP", PUTSP}, {"HALT", HALT}
+    {"ADD", ADD, 3}, {"AND", AND, 3}, {"NOT", NOT, 3}, {"LD", LD, 2},
+    {"LDI", LDI, 3}, {"LDR", LDR, 3}, {"LEA", LEA, 3}, {"ST", ST, 2},
+    {"STR", STR, 3}, {"STI", STI, 3}, {"BR", BR, 2}, {"JSR", JSR, 3},
+    {"JSRR", JSRR, 4}, {"JMP", JMP, 3}, {"RTI", RTI, 3}, {"TRAP", TRAP, 4},
+    {"GETC", GETC, 4}, {"OUT", OUT, 3}, {"PUTS", PUTS, 4}, {"IN", IN, 2},
+    {"PUTSP", PUTSP, 5}, {"HALT", HALT, 4}
 };
 
 OperationCode parse_opcode(const char* token);
