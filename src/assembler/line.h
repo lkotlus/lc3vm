@@ -1,6 +1,7 @@
 #ifndef LINE
 #define LINE
 
+#include <stdio.h>
 #include "assembler/token.h"
 
 // Operations
@@ -34,5 +35,7 @@ typedef struct {
         Operation operation;
     } line;
 } Line;
+
+Line* parse_line(FILE* f);
 
 #endif

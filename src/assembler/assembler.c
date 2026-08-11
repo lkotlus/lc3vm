@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 #include "constants.h"
@@ -83,7 +82,6 @@ void loop(const char* fpath) {
     FILE* file = fopen(fpath, "r");
 
     char line[STRLEN];
-    Operand* o = (Operand*)malloc(sizeof(Operand));
     while (get_line(file, line)) {
         printf("%s\n", line);
 
@@ -99,7 +97,7 @@ void loop(const char* fpath) {
             else if (parse_directivetype(token) != INVALID_DIRECTIVE) {
                 printf("\tDirective: %s\n", token);
             }
-            else if (parse_operand(token, o) != INVALID_OPERAND) {
+            else if (parse_operand(token)->type != INVALID_OPERAND) {
                 printf("\tOperand: %s\n", token);
             } 
         };

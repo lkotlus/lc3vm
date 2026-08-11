@@ -46,7 +46,7 @@ static const RegisterMap reg_map[] = {
     {"R4", R4}, {"R5", R5}, {"R6", R6}, {"R7", R7}
 };
 
-OperandType parse_operand(const char* token, Operand* operand);
+Operand* parse_operand(const char* token);
 
 // Operations
 //

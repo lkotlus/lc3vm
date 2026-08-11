@@ -10,9 +10,9 @@ static int _is_hex(const char* token);
 static int _is_register(const char* token, Register* reg);
 static int _is_opcode(const char* token, OperationCode* opcode);
 static int _is_directive(const char* token, DirectiveType* directive);
-static OperandType _parse_operand_ival(const char* token, int is_dec, Operand* operand);
-static OperandType _parse_operand_reg(Register reg, Operand* operand);
-static OperandType _parse_operand_label(const char* token, Operand* operand);
+static Operand* _parse_operand_ival(const char* token, int is_dec);
+static Operand* _parse_operand_reg(Register reg);
+static Operand* _parse_operand_label(const char* token);
 
 LabelResults parse_label(const char* token) {
     if (_is_register(token, NULL)) return LABEL_INVALID_REGISTER;
@@ -23,21 +23,21 @@ LabelResults parse_label(const char* token) {
     return LABEL_VALID;
 }
 
-OperandType parse_operand(const char* token, Operand* operand) {
+Operand* parse_operand(const char* token) {
     if (_is_dec(token)) {
-        return _parse_operand_ival(token, 1, operand);
+        return _parse_operand_ival(token, 1);
     }
     else if (_is_hex(token)) {
-        return _parse_operand_ival(token, 0, operand);
+        return _parse_operand_ival(token, 0);
     }
 
     for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); i++) {
         if (strcmp(token, reg_map[i].token) == 0) {
-            return _parse_operand_reg(reg_map[i].reg, operand);
+            return _parse_operand_reg(reg_map[i].reg);
         }
     }
 
-    return _parse_operand_label(token, operand);
+    return _parse_operand_label(token);
 }
 
 OperationCode parse_opcode(const char* token) {
@@ -156,7 +156,8 @@ static int _is_directive(const char* token, DirectiveType* directive) {
     return 0;
 }
 
-static OperandType _parse_operand_ival(const char* token, int is_dec, Operand* operand) {
+static Operand* _parse_operand_ival(const char* token, int is_dec) {
+    Operand* operand = (Operand*)malloc(sizeof(Operand));
     operand->type = IVAL_OPERAND;
 
     if (is_dec) {
@@ -167,25 +168,30 @@ static OperandType _parse_operand_ival(const char* token, int is_dec, Operand* o
         operand->operand.ival = (int16_t)strtol(token, NULL, 16);
     }
 
-    return IVAL_OPERAND;
+    return operand;
 }
 
-static OperandType _parse_operand_reg(Register reg, Operand* operand) {
+static Operand* _parse_operand_reg(Register reg) {
+    Operand* operand = (Operand*)malloc(sizeof(Operand));
+
     operand->type = REG_OPERAND;
     operand->operand.reg = reg;
 
-    return REG_OPERAND;
+    return operand;
 }
 
-static OperandType _parse_operand_label(const char* token, Operand* operand) {
+static Operand* _parse_operand_label(const char* token) {
+    Operand* operand = (Operand*)malloc(sizeof(Operand));
+
     operand->type = LABEL_OPERAND;
 
     if (!_validate_label(token)) {
-        return INVALID_OPERAND;
+        operand->type = INVALID_OPERAND;
+        return operand;
     }
 
     strncpy(operand->operand.label, token, STRLEN-1);
     operand->operand.label[STRLEN - 1] = '\0';
 
-    return LABEL_OPERAND;
+    return operand;
 }
