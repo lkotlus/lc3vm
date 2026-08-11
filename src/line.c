@@ -5,45 +5,26 @@
 #include "constants.h"
 
 int _validate_label(const char* token);
-
-// Returns -1 if you have an invalid label name.
-// Returns 0 if you have a label.
-// Returns 1 if you have a register.
-// Returns 2 if you have an opcode.
-// Returns 3 if you have a directive.
-int parse_label(const char* token) {
-    // Check if it's a register...
-    for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); i++) {
-        if (strcmp(token, reg_map[i].token) == 0) {
-            return 1;
-        }
-    }
-
-    // Check if it's an opcode...
-    for (int i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); i++) {
-        if (strcmp(token, opcode_map[i].token) == 0) {
-            return 2;
-        }
-    }
-
-    // Check if it's a directive...
-    for (int i = 0; i < (int)(sizeof(directive_map) / sizeof(directive_map[0])); i++) {
-        if (strcmp(token, directive_map[i].token) == 0) {
-            return 3;
-        }
-    }
-    
-    // Make sure it's valid...
-    if (!_validate_label(token)) {
-        return -1;
-    }
-
-    return 0;
-}
-
+int _is_register(const char* token, Register* reg);
+int _is_opcode(const char* token, OperationCode* opcode);
+int _is_directive(const char* token, DirectiveType* directive);
 OperandType _parse_operand_ival(const char* token, Operand* operand);
 OperandType _parse_operand_reg(Register reg, Operand* operand);
 OperandType _parse_operand_label(const char* token, Operand* operand);
+
+// Returns 1 if you have a register.
+// Returns 2 if you have an opcode.
+// Returns 3 if you have a directive.
+// Returns -1 if you have an invalid label name.
+// Returns 0 if you have a label.
+int parse_label(const char* token) {
+    if (_is_register(token, NULL)) return 1;
+    if (_is_opcode(token, NULL)) return 2;
+    if (_is_directive(token, NULL)) return 3;
+    if (!_validate_label(token)) return -1;
+
+    return 0;
+}
 
 OperandType parse_operand(const char* token, Operand* operand) {
     if (token[0] == '#' || token[0] == '0') {
@@ -85,6 +66,38 @@ int _validate_label(const char* token) {
     }
 
     return 1;
+}
+
+
+int _is_register(const char* token, Register* reg) {
+    for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); i++) {
+        if (strcmp(token, reg_map[i].token) == 0) {
+            *reg = reg_map[i].reg;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+int _is_opcode(const char* token, OperationCode* opcode) {
+    for (int i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); i++) {
+        if (strcmp(token, opcode_map[i].token) == 0) {
+            *opcode = opcode_map[i].opcode;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+int _is_directive(const char* token, DirectiveType* directive) {
+    for (int i = 0; i < (int)(sizeof(directive_map) / sizeof(directive_map[0])); i++) {
+        if (strcmp(token, directive_map[i].token) == 0) {
+            *directive = directive_map[i].directive;
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 OperandType _parse_operand_ival(const char* token, Operand* operand) {
