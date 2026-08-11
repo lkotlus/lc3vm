@@ -14,7 +14,7 @@ int main(int argv, char* args[]) {
     }
     else if (flags->assemble) {
         printf("Assembling %s...\n", flags->inpath);
-        loop(flags->inpath);
+        assemble(flags->inpath);
         printf("Assembled code located in %s\n", flags->outpath);
     }
     else if (flags->disassemble) {

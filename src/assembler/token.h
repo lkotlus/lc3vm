@@ -6,20 +6,17 @@
 
 typedef enum {
     LABEL_VALID,
-    LABEL_INVALID,
-    LABEL_INVALID_REGISTER,
-    LABEL_INVALID_OPCODE,
-    LABEL_INVALID_DIRECTIVE
+    LABEL_INVALID
 } LabelResults;
 
 LabelResults parse_label(const char* token);
 
 // Operands
 typedef enum {
-    IVAL_OPERAND,
-    LABEL_OPERAND,
-    REG_OPERAND,
-    INVALID_OPERAND
+    OPERAND_IVAL,
+    OPERAND_LABEL,
+    OPERAND_REG,
+    OPERAND_INVALID
 } OperandType;
 
 typedef enum {
@@ -59,7 +56,7 @@ typedef enum {
     STR, STI, BR, JSR,
     JSRR, JMP, RTI, TRAP,
     GETC, OUT, PUTS, IN,
-    PUTSP, HALT, INVALID_OPCODE
+    PUTSP, HALT, OPCODE_INVALID
 } OperationCode;
 
 typedef struct {
@@ -80,7 +77,7 @@ static const OperationCodeMap opcode_map[] = {
 OperationCode parse_opcode(const char* token);
 
 // Directives
-typedef enum { ORIG, END, FILL, BLKW, STRINGZ, INVALID_DIRECTIVE } DirectiveType;
+typedef enum { ORIG, END, FILL, BLKW, STRINGZ, DIRECTIVE_INVALID } DirectiveType;
 
 typedef struct {
     const char* token;

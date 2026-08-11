@@ -15,12 +15,9 @@ static Operand* _parse_operand_reg(Register reg);
 static Operand* _parse_operand_label(const char* token);
 
 LabelResults parse_label(const char* token) {
-    if (_is_register(token, NULL)) return LABEL_INVALID_REGISTER;
-    if (_is_opcode(token, NULL)) return LABEL_INVALID_OPCODE;
-    if (_is_directive(token, NULL)) return LABEL_INVALID_DIRECTIVE;
-    if (!_validate_label(token)) return LABEL_INVALID;
+    if (_validate_label(token)) return LABEL_VALID;
 
-    return LABEL_VALID;
+    return LABEL_INVALID;
 }
 
 Operand* parse_operand(const char* token) {
@@ -46,7 +43,7 @@ OperationCode parse_opcode(const char* token) {
         return opcode;
     }
 
-    return INVALID_OPCODE;
+    return OPCODE_INVALID;
 }
 
 DirectiveType parse_directivetype(const char* token) {
@@ -55,18 +52,15 @@ DirectiveType parse_directivetype(const char* token) {
         return directive;
     }
 
-    return INVALID_DIRECTIVE;
+    return DIRECTIVE_INVALID;
 }
 
 static int _validate_label(const char* token) {
-    if (_is_hex(token)) {
-        return 0;
-    }
-
-    // The first character must be [A-Z]
-    if (!(token[0] >= 'A' && token[0] <= 'Z')) {
-        return 0;
-    }
+    if (_is_hex(token)) return 0;
+    if (_is_register(token, NULL)) return 0;
+    if (_is_opcode(token, NULL)) return 0;
+    if (_is_directive(token, NULL)) return 0;
+    if (!(token[0] >= 'A' && token[0] <= 'Z')) return 0;
 
     int i = 1;
     char c = token[i];
@@ -158,7 +152,7 @@ static int _is_directive(const char* token, DirectiveType* directive) {
 
 static Operand* _parse_operand_ival(const char* token, int is_dec) {
     Operand* operand = (Operand*)malloc(sizeof(Operand));
-    operand->type = IVAL_OPERAND;
+    operand->type = OPERAND_IVAL;
 
     if (is_dec) {
         operand->operand.ival = (int16_t)strtol(++token, NULL, 10);
@@ -174,7 +168,7 @@ static Operand* _parse_operand_ival(const char* token, int is_dec) {
 static Operand* _parse_operand_reg(Register reg) {
     Operand* operand = (Operand*)malloc(sizeof(Operand));
 
-    operand->type = REG_OPERAND;
+    operand->type = OPERAND_REG;
     operand->operand.reg = reg;
 
     return operand;
@@ -183,10 +177,10 @@ static Operand* _parse_operand_reg(Register reg) {
 static Operand* _parse_operand_label(const char* token) {
     Operand* operand = (Operand*)malloc(sizeof(Operand));
 
-    operand->type = LABEL_OPERAND;
+    operand->type = OPERAND_LABEL;
 
     if (!_validate_label(token)) {
-        operand->type = INVALID_OPERAND;
+        operand->type = OPERAND_INVALID;
         return operand;
     }
 
