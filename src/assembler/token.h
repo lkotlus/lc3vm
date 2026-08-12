@@ -69,8 +69,8 @@ typedef enum {
 
 typedef struct {
     int n_ops;
-    OperandOption op_types[3];
     int ival_signed;
+    OperandOption op_types[3];
 } OperationSpec;
 
 typedef struct {
@@ -81,28 +81,29 @@ typedef struct {
 } OperationCodeMap;
 
 static const OperationCodeMap opcode_map[] = {
-    {"ADD",   ADD,   3, {3, {OPT_REG, OPT_REG, OPT_REG|OPT_IVA}, 1}},
-    {"AND",   AND,   3, {3, {OPT_REG, OPT_REG, OPT_REG|OPT_IVA}, 1}},
-    {"NOT",   NOT,   3, {2, {OPT_REG, OPT_REG, 0},               0}},
-    {"LD",    LD,    2, {2, {OPT_REG, OPT_LAB, 0},               1}},
-    {"LDI",   LDI,   3, {2, {OPT_REG, OPT_LAB, 0},               1}},
-    {"LDR",   LDR,   3, {3, {OPT_REG, OPT_REG, OPT_IVA},         1}},
-    {"LEA",   LEA,   3, {2, {OPT_REG, OPT_LAB, 0},               1}},
-    {"ST",    ST,    2, {2, {OPT_REG, OPT_LAB, 0},               1}},
-    {"STR",   STR,   3, {3, {OPT_REG, OPT_REG, OPT_IVA},         1}},
-    {"STI",   STI,   3, {2, {OPT_REG, OPT_LAB, 0},               1}},
-    {"BR",    BR,    2, {1, {OPT_LAB, 0, 0},                     1}},
-    {"JSR",   JSR,   3, {1, {OPT_LAB, 0, 0},                     1}},
-    {"JSRR",  JSRR,  4, {1, {OPT_REG, 0, 0},                     0}},
-    {"JMP",   JMP,   3, {1, {OPT_REG, 0, 0},                     0}},
-    {"RTI",   RTI,   3, {0, {0, 0, 0},                           0}},
-    {"TRAP",  TRAP,  4, {1, {OPT_IVA, 0, 0},                     0}},
-    {"GETC",  GETC,  4, {0, {0, 0, 0},                           0}},
-    {"OUT",   OUT,   3, {0, {0, 0, 0},                           0}},
-    {"PUTS",  PUTS,  4, {0, {0, 0, 0},                           0}},
-    {"IN",    IN,    2, {0, {0, 0, 0},                           0}},
-    {"PUTSP", PUTSP, 5, {0, {0, 0, 0},                           0}},
-    {"HALT",  HALT,  4, {0, {0, 0, 0},                           0}},
+    {"ADD",   ADD,            3, {3, 1, {OPT_REG, OPT_REG, OPT_REG|OPT_IVA}} },
+    {"AND",   AND,            3, {3, 1, {OPT_REG, OPT_REG, OPT_REG|OPT_IVA}} },
+    {"NOT",   NOT,            3, {2, 0, {OPT_REG, OPT_REG, 0}}               },
+    {"LD",    LD,             2, {2, 1, {OPT_REG, OPT_LAB, 0}}               },
+    {"LDI",   LDI,            3, {2, 1, {OPT_REG, OPT_LAB, 0}}               },
+    {"LDR",   LDR,            3, {3, 1, {OPT_REG, OPT_REG, OPT_IVA}}         },
+    {"LEA",   LEA,            3, {2, 1, {OPT_REG, OPT_LAB, 0}}               },
+    {"ST",    ST,             2, {2, 1, {OPT_REG, OPT_LAB, 0}}               },
+    {"STR",   STR,            3, {3, 1, {OPT_REG, OPT_REG, OPT_IVA}}         },
+    {"STI",   STI,            3, {2, 1, {OPT_REG, OPT_LAB, 0}}               },
+    {"BR",    BR,             2, {1, 1, {OPT_LAB, 0, 0}}                     },
+    {"JSR",   JSR,            3, {1, 1, {OPT_LAB, 0, 0}}                     },
+    {"JSRR",  JSRR,           4, {1, 0, {OPT_REG, 0, 0}}                     },
+    {"JMP",   JMP,            3, {1, 0, {OPT_REG, 0, 0}}                     },
+    {"RTI",   RTI,            3, {0, 0, {0, 0, 0}}                           },
+    {"TRAP",  TRAP,           4, {1, 0, {OPT_IVA, 0, 0}}                     },
+    {"GETC",  GETC,           4, {0, 0, {0, 0, 0}}                           },
+    {"OUT",   OUT,            3, {0, 0, {0, 0, 0}}                           },
+    {"PUTS",  PUTS,           4, {0, 0, {0, 0, 0}}                           },
+    {"IN",    IN,             2, {0, 0, {0, 0, 0}}                           },
+    {"PUTSP", PUTSP,          5, {0, 0, {0, 0, 0}}                           },
+    {"HALT",  HALT,           4, {0, 0, {0, 0, 0}}                           },
+    {"",      OPCODE_INVALID, 0, {0, 0, {0, 0, 0}}                           }
 };
 
 OperationCode parse_opcode(const char* token);
@@ -117,11 +118,12 @@ typedef struct {
 } DirectiveTypeMap;
 
 static const DirectiveTypeMap directive_map[] = {
-    {".ORIG",    ORIG,    {1, {OPT_IVA, 0, 0},        0}},
-    {".END",     END,     {0, {0, 0, 0},               0}},
-    {".FILL",    FILL,    {1, {OPT_IVA|OPT_LAB, 0, 0}, 1}},
-    {".BLKW",    BLKW,    {1, {OPT_IVA, 0, 0},        0}},
-    {".STRINGZ", STRINGZ, {1, {OPT_STR, 0, 0},         0}},
+    {".ORIG",    ORIG,              {1, 0, {OPT_IVA, 0, 0}}         },
+    {".END",     END,               {0, 0, {0, 0, 0}}               },
+    {".FILL",    FILL,              {1, 1, {OPT_IVA|OPT_LAB, 0, 0}} },
+    {".BLKW",    BLKW,              {1, 0, {OPT_IVA, 0, 0}}         },
+    {".STRINGZ", STRINGZ,           {1, 0, {OPT_STR, 0, 0}}         },
+    {"",         DIRECTIVE_INVALID, {0, 0, {0, 0, 0}}               }
 };
 
 DirectiveType parse_directivetype(const char* token);
