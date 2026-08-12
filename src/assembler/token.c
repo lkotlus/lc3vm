@@ -125,24 +125,30 @@ static int _is_register(const char* token, Register* reg) {
 }
 
 static int _is_opcode(const char* token, OperationCodeMap* opcodemap) {
-    for (int i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); i++) {
+    int i;
+
+    for (i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); i++) {
         if (strncmp(token, opcode_map[i].token, opcode_map[i].strncmp) == 0) {
             if (opcodemap) *opcodemap = opcode_map[i];
             return 1;
         }
     }
 
+    if (opcodemap) *opcodemap = opcode_map[i-1];
     return 0;
 }
 
 static int _is_directive(const char* token, DirectiveTypeMap* dirtypemap) {
-    for (int i = 0; i < (int)(sizeof(directive_map) / sizeof(directive_map[0])); i++) {
+    int i;
+
+    for (i = 0; i < (int)(sizeof(directive_map) / sizeof(directive_map[0])); i++) {
         if (strcmp(token, directive_map[i].token) == 0) {
             if (dirtypemap) *dirtypemap = directive_map[i];
             return 1;
         }
     }
 
+    if (dirtypemap) *dirtypemap = directive_map[i-1];
     return 0;
 }
 

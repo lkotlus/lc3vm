@@ -103,7 +103,7 @@ static const OperationCodeMap opcode_map[] = {
     {"IN",    IN,             2, {0, 0, {0, 0, 0}}                           },
     {"PUTSP", PUTSP,          5, {0, 0, {0, 0, 0}}                           },
     {"HALT",  HALT,           4, {0, 0, {0, 0, 0}}                           },
-    {"",      OPCODE_INVALID, 0, {0, 0, {0, 0, 0}}                           }
+    {"",      OPCODE_INVALID, 2, {0, 0, {0, 0, 0}}                           }
 };
 
 OperationCodeMap* parse_opcode(const char* token);
