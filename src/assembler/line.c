@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -13,7 +14,7 @@ static int _get_token(char** line, char* token);
 static Operation* _get_operation(char** fl, OperationCodeMap* opcodemap);
 static Directive* _get_directive(char** fl, DirectiveTypeMap* dirtypemap);
 
-Line* parse_line(FILE* f) {
+Line* parse_line(FILE* f, int addr) {
     Line* line = (Line*)malloc(sizeof(Line));
     line->err = LINE_ERR_NONE;
     line->label[0] = '\0';
@@ -57,6 +58,12 @@ Line* parse_line(FILE* f) {
         line->err = LINE_ERR_INVALID_TOKEN;
         return line;
     }
+
+    if (addr < 0) {
+        if (line->line.directive.type != ORIG) line->err = LINE_ERR_NO_ORIG;
+        else line->addr = line->line.directive.operand.operand.ival;
+    }
+    else line->addr = (uint16_t)addr;
 
     return line;
 }

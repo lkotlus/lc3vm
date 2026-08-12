@@ -38,6 +38,7 @@ typedef struct {
 typedef enum {
     LINE_ERR_NONE,
     LINE_ERR_INVALID_TOKEN,
+    LINE_ERR_NO_ORIG,
     LINE_ERR_OP,
     LINE_ERR_DIR,
 } LineErr;
@@ -47,7 +48,8 @@ typedef enum {
     LINE_DIRECTIVE
 } LineType;
 
-typedef struct {
+typedef struct Line Line;
+struct Line {
     LineErr err;
     uint16_t addr;
     char label[STRLEN];
@@ -56,8 +58,9 @@ typedef struct {
         Directive directive;
         Operation operation;
     } line;
-} Line;
+    Line* next;
+};
 
-Line* parse_line(FILE* f);
+Line* parse_line(FILE* f, int addr);
 
 #endif

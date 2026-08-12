@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <stdio.h>
 #include "assembler/line.h"
 #include "assembler/token.h"
@@ -6,7 +5,9 @@
 void assemble(const char* fpath) {
     FILE* file = fopen(fpath, "r");
     
-    for (Line* line = parse_line(file); line; line = parse_line(file)) {
+    for (Line* line = parse_line(file, -1); line; line = parse_line(file, (int)(line->addr+1))) {
+        printf("0x%x\t\t", line->addr);
+
         if (line->label[0]) printf("%s ", line->label);
 
         if (line->type == LINE_OPERATION) {
@@ -53,7 +54,6 @@ void assemble(const char* fpath) {
         }
 
         printf("\n");
-        free(line);
     };
 
     fclose(file);
