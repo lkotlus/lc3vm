@@ -81,7 +81,6 @@ static int _is_dec(const char* token) {
         }
 
         while (c != '\0') {
-            // Valid decimal digits [0-9]
             if (!(c >= '0' && c <= '9')) {
                 return 0;
             }
@@ -100,7 +99,6 @@ static int _is_hex(const char* token) {
         char c = token[i];
 
         while (c != '\0') {
-            // Valid hex digits [0-9A-F]
             if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F'))) {
                 return 0;
             }

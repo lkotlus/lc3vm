@@ -47,11 +47,6 @@ static const RegisterMap reg_map[] = {
 
 Operand* parse_operand(const char* token);
 
-// Operations
-//
-// Notes:
-//  1. RET needs to be treated as JMP R7
-//  2. BR instructions (BRz, BRnz, etc.) need a bitmap as an ival into operands[1]
 typedef enum {
     ADD, AND, NOT, LD,
     LDI, LDR, LEA, ST,
