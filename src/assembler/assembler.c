@@ -1,14 +1,27 @@
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "assembler/line.h"
 #include "assembler/token.h"
+#include "assembler/assembler.h"
+
+static LabelMap* _label_map_factory(char* label, uint16_t addr);
 
 void assemble(const char* fpath) {
     FILE* file = fopen(fpath, "r");
+    LabelList labell = {NULL, NULL};
     
     for (Line* line = parse_line(file, -1); line; line = parse_line(file, (int)(line->addr+1))) {
         printf("0x%x\t\t", line->addr);
 
-        if (line->label[0]) printf("%s ", line->label);
+        if (line->label[0]) {
+            printf("%s ", line->label);
+            if (!labell.head) {
+                labell.head = _label_map_factory(line->label, line->addr);
+                labell.current = labell.head;
+            }
+        } 
 
         if (line->type == LINE_OPERATION) {
             printf("%d ", line->line.operation.opcode);
@@ -57,4 +70,15 @@ void assemble(const char* fpath) {
     };
 
     fclose(file);
+}
+
+static LabelMap* _label_map_factory(char* label, uint16_t addr) {
+    LabelMap* lmap = (LabelMap*)malloc(sizeof(LabelMap));
+
+    lmap->addr = addr;
+    strncpy(lmap->label, label, STRLEN-1);
+    lmap->label[STRLEN-1] = '\0';
+    lmap->next = NULL;
+
+    return lmap;
 }

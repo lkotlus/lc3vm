@@ -8,6 +8,7 @@
 #include "assembler/line.h"
 
 // Gets the next line of a file that contains a token
+static Line* _line_factory();
 static int _get_fline(FILE* f, char* line);
 static void _skip_comment(FILE* f, int* ch);
 static int _get_token(char** line, char* token);
@@ -15,9 +16,7 @@ static Operation* _get_operation(char** fl, OperationCodeMap* opcodemap);
 static Directive* _get_directive(char** fl, DirectiveTypeMap* dirtypemap);
 
 Line* parse_line(FILE* f, int addr) {
-    Line* line = (Line*)malloc(sizeof(Line));
-    line->err = LINE_ERR_NONE;
-    line->label[0] = '\0';
+    Line* line = _line_factory();
     char fline[STRLEN];
 
     if (!_get_fline(f, fline)) {
@@ -64,6 +63,16 @@ Line* parse_line(FILE* f, int addr) {
         else line->addr = line->line.directive.operand.operand.ival;
     }
     else line->addr = (uint16_t)addr;
+
+    return line;
+}
+
+static Line* _line_factory() {
+    Line* line = (Line*)malloc(sizeof(Line));
+
+    line->err = LINE_ERR_NONE;
+    line->label[0] = '\0';
+    line->next = NULL;
 
     return line;
 }
