@@ -21,6 +21,13 @@ typedef enum {
 } OperandType;
 
 typedef enum {
+    OPT_STR = 1 << 0,
+    OPT_LAB = 1 << 1,
+    OPT_IVA = 1 << 2,
+    OPT_REG = 1 << 3,
+} OperandOption;
+
+typedef enum {
     R0, R1, R2, R3,
     R4, R5, R6, R7
 } Register;
@@ -60,33 +67,42 @@ typedef enum {
     PUTSP, HALT, OPCODE_INVALID
 } OperationCode;
 
-// Each op_type is defined by a 4-bit bitmap.
-//  0   1   0   1
-//  ^   ^   ^   ^
-//  |   |   |   |
-// REG IVA LAB STR
-//
-// So 0101 (5) means the operand can be either an 
-// ival or a stringz.
 typedef struct {
     int n_ops;
-    int op_types[3];
-    int op_sizes[3];
+    OperandOption op_types[3];
+    int ival_signed;
 } OperationSpec;
 
 typedef struct {
     const char* token;
     OperationCode opcode;
     int strncmp;
+    OperationSpec opspec;
 } OperationCodeMap;
 
 static const OperationCodeMap opcode_map[] = {
-    {"ADD", ADD, 3}, {"AND", AND, 3}, {"NOT", NOT, 3}, {"LD", LD, 2},
-    {"LDI", LDI, 3}, {"LDR", LDR, 3}, {"LEA", LEA, 3}, {"ST", ST, 2},
-    {"STR", STR, 3}, {"STI", STI, 3}, {"BR", BR, 2}, {"JSR", JSR, 3},
-    {"JSRR", JSRR, 4}, {"JMP", JMP, 3}, {"RTI", RTI, 3}, {"TRAP", TRAP, 4},
-    {"GETC", GETC, 4}, {"OUT", OUT, 3}, {"PUTS", PUTS, 4}, {"IN", IN, 2},
-    {"PUTSP", PUTSP, 5}, {"HALT", HALT, 4}
+    {"ADD",   ADD,   3, {3, {OPT_REG, OPT_REG, OPT_REG|OPT_IVA}, 1}},
+    {"AND",   AND,   3, {3, {OPT_REG, OPT_REG, OPT_REG|OPT_IVA}, 1}},
+    {"NOT",   NOT,   3, {2, {OPT_REG, OPT_REG, 0},               0}},
+    {"LD",    LD,    2, {2, {OPT_REG, OPT_LAB, 0},               1}},
+    {"LDI",   LDI,   3, {2, {OPT_REG, OPT_LAB, 0},               1}},
+    {"LDR",   LDR,   3, {3, {OPT_REG, OPT_REG, OPT_IVA},         1}},
+    {"LEA",   LEA,   3, {2, {OPT_REG, OPT_LAB, 0},               1}},
+    {"ST",    ST,    2, {2, {OPT_REG, OPT_LAB, 0},               1}},
+    {"STR",   STR,   3, {3, {OPT_REG, OPT_REG, OPT_IVA},         1}},
+    {"STI",   STI,   3, {2, {OPT_REG, OPT_LAB, 0},               1}},
+    {"BR",    BR,    2, {1, {OPT_LAB, 0, 0},                     1}},
+    {"JSR",   JSR,   3, {1, {OPT_LAB, 0, 0},                     1}},
+    {"JSRR",  JSRR,  4, {1, {OPT_REG, 0, 0},                     0}},
+    {"JMP",   JMP,   3, {1, {OPT_REG, 0, 0},                     0}},
+    {"RTI",   RTI,   3, {0, {0, 0, 0},                           0}},
+    {"TRAP",  TRAP,  4, {1, {OPT_IVA, 0, 0},                     0}},
+    {"GETC",  GETC,  4, {0, {0, 0, 0},                           0}},
+    {"OUT",   OUT,   3, {0, {0, 0, 0},                           0}},
+    {"PUTS",  PUTS,  4, {0, {0, 0, 0},                           0}},
+    {"IN",    IN,    2, {0, {0, 0, 0},                           0}},
+    {"PUTSP", PUTSP, 5, {0, {0, 0, 0},                           0}},
+    {"HALT",  HALT,  4, {0, {0, 0, 0},                           0}},
 };
 
 OperationCode parse_opcode(const char* token);
@@ -97,14 +113,15 @@ typedef enum { ORIG, END, FILL, BLKW, STRINGZ, DIRECTIVE_INVALID } DirectiveType
 typedef struct {
     const char* token;
     DirectiveType directive;
+    OperationSpec opspec;
 } DirectiveTypeMap;
 
 static const DirectiveTypeMap directive_map[] = {
-    {".ORIG", ORIG}, 
-    {".END", END}, 
-    {".FILL", FILL}, 
-    {".BLKW", BLKW},
-    {".STRINGZ", STRINGZ}
+    {".ORIG",    ORIG,    {1, {OPT_IVA, 0, 0},        0}},
+    {".END",     END,     {0, {0, 0, 0},               0}},
+    {".FILL",    FILL,    {1, {OPT_IVA|OPT_LAB, 0, 0}, 1}},
+    {".BLKW",    BLKW,    {1, {OPT_IVA, 0, 0},        0}},
+    {".STRINGZ", STRINGZ, {1, {OPT_STR, 0, 0},         0}},
 };
 
 DirectiveType parse_directivetype(const char* token);
