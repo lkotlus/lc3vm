@@ -37,16 +37,16 @@ Operand* parse_operand(const char* token) {
     return _parse_operand_label(token);
 }
 
-OperationCodeMap parse_opcode(const char* token) {
-    OperationCodeMap opcodemap;
-    _is_opcode(token, &opcodemap);
+OperationCodeMap* parse_opcode(const char* token) {
+    OperationCodeMap* opcodemap = (OperationCodeMap*)malloc(sizeof(OperationCodeMap));
+    _is_opcode(token, opcodemap);
 
     return opcodemap;
 }
 
-DirectiveTypeMap parse_dirtype(const char* token) {
-    DirectiveTypeMap dirtypemap;
-    _is_directive(token, &dirtypemap);
+DirectiveTypeMap* parse_dirtype(const char* token) {
+    DirectiveTypeMap* dirtypemap = (DirectiveTypeMap*)malloc(sizeof(DirectiveTypeMap));
+    _is_directive(token, dirtypemap);
 
     return dirtypemap;
 }

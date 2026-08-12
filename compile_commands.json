@@ -14,21 +14,5 @@
     "directory": "/home/lkotlus/Everything/Gramming/lc3vm",
     "file": "/home/lkotlus/Everything/Gramming/lc3vm/src/assembler/line.c",
     "output": "/home/lkotlus/Everything/Gramming/lc3vm/build/assembler/line.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/gcc",
-      "-Isrc",
-      "-Wall",
-      "-Wextra",
-      "-std=c11",
-      "-c",
-      "-o",
-      "build/assembler/token.o",
-      "src/assembler/token.c"
-    ],
-    "directory": "/home/lkotlus/Everything/Gramming/lc3vm",
-    "file": "/home/lkotlus/Everything/Gramming/lc3vm/src/assembler/token.c",
-    "output": "/home/lkotlus/Everything/Gramming/lc3vm/build/assembler/token.o"
   }
 ]
