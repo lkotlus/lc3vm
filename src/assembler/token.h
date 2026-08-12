@@ -16,6 +16,7 @@ typedef enum {
     OPERAND_IVAL,
     OPERAND_LABEL,
     OPERAND_REG,
+    OPERAND_STRINGZ,
     OPERAND_INVALID
 } OperandType;
 
@@ -59,10 +60,24 @@ typedef enum {
     PUTSP, HALT, OPCODE_INVALID
 } OperationCode;
 
+// Each op_type is defined by a 4-bit bitmap.
+//  0   1   0   1
+//  ^   ^   ^   ^
+//  |   |   |   |
+// REG IVA LAB STR
+//
+// So 0101 (5) means the operand can be either an 
+// ival or a stringz.
+typedef struct {
+    int n_ops;
+    int op_types[3];
+    int op_sizes[3];
+} OperationSpec;
+
 typedef struct {
     const char* token;
     OperationCode opcode;
-    int n;
+    int strncmp;
 } OperationCodeMap;
 
 static const OperationCodeMap opcode_map[] = {
