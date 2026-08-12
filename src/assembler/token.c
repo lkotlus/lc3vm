@@ -154,7 +154,7 @@ static int _is_directive(const char* token, DirectiveTypeMap* dirtypemap) {
 
 static Operand* _parse_operand_ival(const char* token, int is_dec) {
     Operand* operand = (Operand*)malloc(sizeof(Operand));
-    operand->type = OPERAND_IVAL;
+    operand->type = OPT_IVA;
 
     if (is_dec) {
         operand->operand.ival = (int16_t)strtol(++token, NULL, 10);
@@ -170,7 +170,7 @@ static Operand* _parse_operand_ival(const char* token, int is_dec) {
 static Operand* _parse_operand_reg(Register reg) {
     Operand* operand = (Operand*)malloc(sizeof(Operand));
 
-    operand->type = OPERAND_REG;
+    operand->type = OPT_REG;
     operand->operand.reg = reg;
 
     return operand;
@@ -179,7 +179,7 @@ static Operand* _parse_operand_reg(Register reg) {
 static Operand* _parse_operand_label(const char* token) {
     Operand* operand = (Operand*)malloc(sizeof(Operand));
 
-    operand->type = OPERAND_LABEL;
+    operand->type = OPT_LAB;
 
     if (!_validate_label(token)) {
         operand->type = OPERAND_INVALID;

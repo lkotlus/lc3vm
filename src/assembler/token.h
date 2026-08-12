@@ -13,19 +13,12 @@ LabelResult parse_label(const char* token);
 
 // Operands
 typedef enum {
-    OPERAND_IVAL,
-    OPERAND_LABEL,
-    OPERAND_REG,
-    OPERAND_STRINGZ,
-    OPERAND_INVALID
-} OperandType;
-
-typedef enum {
     OPT_STR = 1 << 0,
     OPT_LAB = 1 << 1,
     OPT_IVA = 1 << 2,
     OPT_REG = 1 << 3,
-} OperandOption;
+    OPERAND_INVALID = 0
+} OperandType;
 
 typedef enum {
     R0, R1, R2, R3,
@@ -72,7 +65,7 @@ typedef enum {
 typedef struct {
     int n_ops;
     int ival_signed;
-    OperandOption op_types[3];
+    OperandType op_types[3];
 } OperationSpec;
 
 typedef struct {
@@ -121,16 +114,16 @@ typedef enum { ORIG, END, FILL, BLKW, STRINGZ, DIRECTIVE_INVALID } DirectiveType
 typedef struct {
     const char* token;
     DirectiveType dirtype;
-    OperationSpec opspec;
+    OperandType operand;
 } DirectiveTypeMap;
 
 static const DirectiveTypeMap directive_map[] = {
-    {".ORIG",    ORIG,              {1, 0, {OPT_IVA, 0, 0}}         },
-    {".END",     END,               {0, 0, {0, 0, 0}}               },
-    {".FILL",    FILL,              {1, 1, {OPT_IVA|OPT_LAB, 0, 0}} },
-    {".BLKW",    BLKW,              {1, 0, {OPT_IVA, 0, 0}}         },
-    {".STRINGZ", STRINGZ,           {1, 0, {OPT_STR, 0, 0}}         },
-    {"",         DIRECTIVE_INVALID, {0, 0, {0, 0, 0}}               }
+    {".ORIG",    ORIG,              OPT_IVA         },
+    {".END",     END,               OPERAND_INVALID },
+    {".FILL",    FILL,              OPT_IVA|OPT_LAB },
+    {".BLKW",    BLKW,              OPT_IVA         },
+    {".STRINGZ", STRINGZ,           OPT_STR         },
+    {"",         DIRECTIVE_INVALID, OPERAND_INVALID }
 };
 
 DirectiveTypeMap* parse_dirtype(const char* token);
