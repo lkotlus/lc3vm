@@ -106,7 +106,7 @@ static const OperationCodeMap opcode_map[] = {
     {"",      OPCODE_INVALID, 0, {0, 0, {0, 0, 0}}                           }
 };
 
-OperationCode parse_opcode(const char* token);
+OperationCodeMap parse_opcode(const char* token);
 
 // Directives
 typedef enum { ORIG, END, FILL, BLKW, STRINGZ, DIRECTIVE_INVALID } DirectiveType;
@@ -126,6 +126,6 @@ static const DirectiveTypeMap directive_map[] = {
     {"",         DIRECTIVE_INVALID, {0, 0, {0, 0, 0}}               }
 };
 
-DirectiveType parse_directivetype(const char* token);
+DirectiveTypeMap parse_directivetype(const char* token);
 
 #endif

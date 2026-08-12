@@ -8,8 +8,8 @@ static int _validate_label(const char* token);
 static int _is_dec(const char* token);
 static int _is_hex(const char* token);
 static int _is_register(const char* token, Register* reg);
-static int _is_opcode(const char* token, OperationCode* opcode);
-static int _is_directive(const char* token, DirectiveType* directive);
+static int _is_opcode(const char* token, OperationCodeMap* opcodemap);
+static int _is_directive(const char* token, DirectiveTypeMap* dirtypemap);
 static Operand* _parse_operand_ival(const char* token, int is_dec);
 static Operand* _parse_operand_reg(Register reg);
 static Operand* _parse_operand_label(const char* token);
@@ -37,22 +37,18 @@ Operand* parse_operand(const char* token) {
     return _parse_operand_label(token);
 }
 
-OperationCode parse_opcode(const char* token) {
-    OperationCode opcode;
-    if (_is_opcode(token, &opcode)) {
-        return opcode;
-    }
+OperationCodeMap parse_opcode(const char* token) {
+    OperationCodeMap opcodemap;
+    _is_opcode(token, &opcodemap);
 
-    return OPCODE_INVALID;
+    return opcodemap;
 }
 
-DirectiveType parse_directivetype(const char* token) {
-    DirectiveType directive;
-    if (_is_directive(token, &directive)) {
-        return directive;
-    }
+DirectiveTypeMap parse_dirtype(const char* token) {
+    DirectiveTypeMap dirtypemap;
+    _is_directive(token, &dirtypemap);
 
-    return DIRECTIVE_INVALID;
+    return dirtypemap;
 }
 
 static int _validate_label(const char* token) {
@@ -128,10 +124,10 @@ static int _is_register(const char* token, Register* reg) {
     return 0;
 }
 
-static int _is_opcode(const char* token, OperationCode* opcode) {
+static int _is_opcode(const char* token, OperationCodeMap* opcodemap) {
     for (int i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); i++) {
         if (strncmp(token, opcode_map[i].token, opcode_map[i].strncmp) == 0) {
-            if (opcode) *opcode = opcode_map[i].opcode;
+            if (opcodemap) *opcodemap = opcode_map[i];
             return 1;
         }
     }
@@ -139,10 +135,10 @@ static int _is_opcode(const char* token, OperationCode* opcode) {
     return 0;
 }
 
-static int _is_directive(const char* token, DirectiveType* directive) {
+static int _is_directive(const char* token, DirectiveTypeMap* dirtypemap) {
     for (int i = 0; i < (int)(sizeof(directive_map) / sizeof(directive_map[0])); i++) {
         if (strcmp(token, directive_map[i].token) == 0) {
-            if (directive) *directive = directive_map[i].directive;
+            if (dirtypemap) *dirtypemap = directive_map[i];
             return 1;
         }
     }
