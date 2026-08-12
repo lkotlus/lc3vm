@@ -43,8 +43,8 @@ typedef enum {
 } LineErr;
 
 typedef enum {
-    OPERATION,
-    DIRECTIVE
+    LINE_OPERATION,
+    LINE_DIRECTIVE
 } LineType;
 
 typedef struct {

@@ -16,23 +16,23 @@ static Directive* _get_directive(char** fl, DirectiveTypeMap* dirtypemap);
 Line* parse_line(FILE* f) {
     Line* line = (Line*)malloc(sizeof(Line));
     line->err = LINE_ERR_NONE;
+    line->label[0] = '\0';
     char fline[STRLEN];
 
     if (!_get_fline(f, fline)) {
         return NULL;
     }
 
-    printf("%s\n", fline);
-
     char token[STRLEN];
     char* fl = fline;
+
+    printf("%s\n", fline);
 
     _get_token(&fl, token);
 
     if (parse_label(token) == LABEL_VALID) {
         strncpy(line->label, token, STRLEN-1);
         line->label[STRLEN - 1] = '\0';
-        printf("\t\t\tLabel: %s\n", token);
 
         _get_token(&fl, token);
     }
@@ -40,15 +40,15 @@ Line* parse_line(FILE* f) {
     OperationCodeMap* opcodemap = parse_opcode(token);
     DirectiveTypeMap* dirtypemap = parse_dirtype(token);
     if (opcodemap->opcode != OPCODE_INVALID) {
-       printf("\t\t\tOpcode: %s\n", token);
        Operation* op = _get_operation(&fl, opcodemap);
+       line->type = LINE_OPERATION;
        line->line.operation = *op;
 
        if (op->err != OP_ERR_NONE) line->err = LINE_ERR_OP;
     }
     else if (dirtypemap->dirtype != DIRECTIVE_INVALID) {
-        printf("\t\t\tDirective: %s\n", token);
         Directive* dir = _get_directive(&fl, dirtypemap);
+        line->type = LINE_DIRECTIVE;
         line->line.directive = *dir;
 
         if (dir->err != DIR_ERR_NONE) line->err = LINE_ERR_DIR;
@@ -135,7 +135,6 @@ static Operation* _get_operation(char** fl, OperationCodeMap* opcodemap) {
             return op;
         }
 
-        printf("\t\t\tOperand: %s\n", token);
         op->operands[i] = *operand;
     }
 
@@ -167,7 +166,6 @@ static Directive* _get_directive(char** fl, DirectiveTypeMap* dirtypemap) {
             return dir;
         }
 
-        printf("\t\t\tOperand: %s\n", token);
         dir->operand = *operand;
     }
 

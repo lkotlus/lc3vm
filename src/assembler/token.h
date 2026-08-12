@@ -31,6 +31,7 @@ typedef struct {
         int16_t ival;
         Register reg;
         char label[STRLEN];
+        char stringz[STRLEN];
     } operand;
 } Operand;
 
@@ -85,14 +86,14 @@ static const OperationCodeMap opcode_map[] = {
     {"ST",    ST,             {2, 1, {OPT_REG, OPT_LAB, 0}}               },
     {"STR",   STR,            {3, 1, {OPT_REG, OPT_REG, OPT_IVA}}         },
     {"STI",   STI,            {2, 1, {OPT_REG, OPT_LAB, 0}}               },
-    {"BR",    BR,             {1, 1, {OPT_LAB, 0, 0}}                     },
-    {"BRN",   BRN,            {1, 1, {OPT_LAB, 0, 0}}                     },
-    {"BRZ",   BRZ,            {1, 1, {OPT_LAB, 0, 0}}                     },
-    {"BRP",   BRP,            {1, 1, {OPT_LAB, 0, 0}}                     },
-    {"BRNZ",  BRNZ,           {1, 1, {OPT_LAB, 0, 0}}                     },
-    {"BRZP",  BRZP,           {1, 1, {OPT_LAB, 0, 0}}                     },
-    {"BRZP",  BRNP,           {1, 1, {OPT_LAB, 0, 0}}                     },
-    {"JSR",   JSR,            {1, 1, {OPT_LAB, 0, 0}}                     },
+    {"BR",    BR,             {1, 1, {OPT_IVA|OPT_LAB, 0, 0}}             },
+    {"BRN",   BRN,            {1, 1, {OPT_IVA|OPT_LAB, 0, 0}}             },
+    {"BRZ",   BRZ,            {1, 1, {OPT_IVA|OPT_LAB, 0, 0}}             },
+    {"BRP",   BRP,            {1, 1, {OPT_IVA|OPT_LAB, 0, 0}}             },
+    {"BRNZ",  BRNZ,           {1, 1, {OPT_IVA|OPT_LAB, 0, 0}}             },
+    {"BRZP",  BRZP,           {1, 1, {OPT_IVA|OPT_LAB, 0, 0}}             },
+    {"BRZP",  BRNP,           {1, 1, {OPT_IVA|OPT_LAB, 0, 0}}             },
+    {"JSR",   JSR,            {1, 1, {OPT_IVA|OPT_LAB, 0, 0}}             },
     {"JSRR",  JSRR,           {1, 0, {OPT_REG, 0, 0}}                     },
     {"JMP",   JMP,            {1, 0, {OPT_REG, 0, 0}}                     },
     {"RTI",   RTI,            {0, 0, {0, 0, 0}}                           },
