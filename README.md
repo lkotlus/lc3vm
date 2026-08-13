@@ -64,3 +64,6 @@ Features that I need to support
 - Inverse of the assmbler
 ## VM
 - Don't even talk to me
+
+# Lint
+`clang-format -i --style="{BasedOnStyle: llvm, PointerAlignment: Right}" src/**/*.c src/**/*.h`
