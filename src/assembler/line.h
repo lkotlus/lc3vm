@@ -11,9 +11,7 @@ typedef enum {
   OP_ERR_TOO_FEW_OPERANDS,
   OP_ERR_WRONG_TYPE_OPERANDS
 } OperationErr;
-static const char *operation_errs[] = {
-    "OP_ERR_NONE", "OP_ERR_TOO_MANY_OPERANDS", "OP_ERR_TOO_FEW_OPERANDS",
-    "OP_ERR_WRONG_TYPE_OPERANDS"};
+extern const char *operation_errs[];
 
 typedef struct {
   OperationErr err;
@@ -29,9 +27,7 @@ typedef enum {
   DIR_ERR_TOO_FEW_OPERANDS,
   DIR_ERR_WRONG_TYPE_OPERANDS
 } DirectiveErr;
-static const char *directive_errs[] = {
-    "DIR_ERR_NONE", "DIR_ERR_TOO_MANY_OPERANDS", "DIR_ERR_TOO_FEW_OPERANDS",
-    "DIR_ERR_WRONG_TYPE_OPERANDS"};
+extern const char *directive_errs[];
 
 typedef struct {
   DirectiveErr err;
@@ -48,13 +44,10 @@ typedef enum {
   LINE_ERR_OP,
   LINE_ERR_DIR,
 } LineErr;
-static const char *line_errs[] = {
-    "LINE_ERR_NONE", "LINE_ERR_INVALID_TOKEN", "LINE_ERR_NO_ORIG",
-    "LINE_ERR_OP",   "LINE_ERR_DIR",
-};
+extern const char *line_errs[];
 
 typedef enum { LINE_OPERATION, LINE_DIRECTIVE } LineType;
-static const char *line_types[] = {"LINE_OPERATION", "LINE_DIRECTIVE"};
+extern const char *line_types[];
 
 typedef struct Line Line;
 struct Line {

@@ -7,6 +7,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+const char *line_errs[] = {
+    "LINE_ERR_NONE", "LINE_ERR_INVALID_TOKEN", "LINE_ERR_NO_ORIG",
+    "LINE_ERR_OP",   "LINE_ERR_DIR",
+};
+const char *operation_errs[] = {
+    "OP_ERR_NONE", "OP_ERR_TOO_MANY_OPERANDS", "OP_ERR_TOO_FEW_OPERANDS",
+    "OP_ERR_WRONG_TYPE_OPERANDS"};
+const char *directive_errs[] = {
+    "DIR_ERR_NONE", "DIR_ERR_TOO_MANY_OPERANDS", "DIR_ERR_TOO_FEW_OPERANDS",
+    "DIR_ERR_WRONG_TYPE_OPERANDS"};
+const char *line_types[] = {"LINE_OPERATION", "LINE_DIRECTIVE"};
+
 // Gets the next line of a file that contains a token
 static Line *_line_factory();
 static int _get_fline(FILE *f, char *line);
