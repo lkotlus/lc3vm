@@ -10,6 +10,8 @@ static int _first_pass(FILE* file, LabelList* labell, LineList* linel);
 static LabelMap* _label_map_factory(char* label, uint16_t addr);
 static void _labell_push(LabelList* labell, LabelMap* lmap);
 static void _linel_push(LineList* linel, Line* line);
+static void _free_labell(LabelList* labell);
+static void _free_linel(LineList* linel);
 static void _print_labell(LabelList* labell);
 static void _print_linel(LineList* linel);
 
@@ -28,6 +30,9 @@ void assemble(const char* fpath) {
 
     _print_labell(&labell);
     uint16_t instructions[n_lines];
+
+    _free_labell(&labell);
+    _free_linel(&linel);
 
     fclose(file);
 }
@@ -85,6 +90,30 @@ static void _linel_push(LineList* linel, Line* line) {
     }
 }
 
+static void _free_labell(LabelList* labell) {
+    LabelMap* old = labell->head;
+    LabelMap* current = labell->head;
+
+    while (current) {
+        old = current;
+        current = current->next;
+
+        free(old);
+    }
+}
+
+static void _free_linel(LineList* linel) {
+    Line* old = linel->head;
+    Line* current = linel->head;
+
+    while (current) {
+        old = current;
+        current = current->next;
+
+        free(old);
+    }
+}
+
 static void _print_labell(LabelList* labell) {
     LabelMap* current = labell->head;
 
@@ -92,8 +121,6 @@ static void _print_labell(LabelList* labell) {
         printf("%s\t0x%x\n", current->label, current->addr);
         current = current->next;
     }
-
-    labell->tail = labell->head;
 }
 
 static void _print_linel(LineList* linel) {
@@ -102,5 +129,3 @@ static void _print_linel(LineList* linel) {
     while (current) {
     }
 }
-
-
