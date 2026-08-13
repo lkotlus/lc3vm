@@ -33,10 +33,11 @@ void assemble(const char *fpath) {
 
   _print_labell(&labell);
   printf("\n");
-  _print_linel(&linel);
 
   uint16_t instructions[words];
   _second_pass(&linel, &labell, instructions);
+
+  _print_linel(&linel);
 
   _free_labell(&labell);
   _free_linel(&linel);
