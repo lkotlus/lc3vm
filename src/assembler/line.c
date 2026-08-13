@@ -109,7 +109,7 @@ static int _get_fline(FILE *f, char *fline) {
   int ch;
   int i = 0;
 
-  while (((ch = toupper(fgetc(f))) != EOF) &&
+  while (((ch = fgetc(f)) != EOF) &&
          (isspace((unsigned char)ch) || ch == ';')) {
     _skip_comment(f, &ch);
   }
@@ -123,7 +123,7 @@ static int _get_fline(FILE *f, char *fline) {
       fline[i++] = (unsigned char)ch;
     }
 
-    ch = toupper(fgetc(f));
+    ch = fgetc(f);
   }
   _skip_comment(f, &ch);
 
@@ -134,7 +134,7 @@ static int _get_fline(FILE *f, char *fline) {
 
 static void _skip_comment(FILE *f, int *ch) {
   if (*ch == ';') {
-    while (((*ch = toupper(fgetc(f))) != EOF) && *ch != '\n');
+    while (((*ch = fgetc(f)) != EOF) && *ch != '\n');
   }
 }
 
@@ -142,15 +142,45 @@ static int _get_token(char **fline, char *token) {
   int i = 0;
 
   while (**fline != '\0') {
-    while (!isspace(**fline) && **fline != ',' && **fline != '\0') {
-      token[i++] = *((*fline)++);  // Someone ought to lock me up for this.
+    while (isspace(**fline) || **fline == ',') {
+      ++(*fline);
     }
-    if (i > 0) {
+    if (**fline == '\0') {
+      break;
+    }
+
+    // Deal with .STRINGZ
+    if (**fline == '"') {
+      token[i++] = *((*fline)++);
+
+      while (**fline != '\0' && **fline != '"') {
+        if (**fline == '\\' && *((*fline) + 1) != '\0') {
+          ++(*fline);
+          char c = *((*fline)++);
+          switch (c) {
+            case 'n':  token[i++] = '\n'; break;
+            case 't':  token[i++] = '\t'; break;
+            case 'r':  token[i++] = '\r'; break;
+            case '\\': token[i++] = '\\'; break;
+            case '"':  token[i++] = '"';  break;
+            default:
+              token[i++] = c;
+              break;
+          }
+        } else {
+          token[i++] = *((*fline)++);  // Someone ought to lock me up for this.
+        }
+      }
+
       token[i] = '\0';
       return 1;
     }
 
-    ++(*fline);
+    while (!isspace(**fline) && **fline != ',' && **fline != '\0' && **fline != '"') {
+      token[i++] = toupper(*((*fline)++));  // Someone ought to lock me up for this.
+    }
+    token[i] = '\0';
+    return 1;
   }
 
   token[i] = '\0';
@@ -247,7 +277,7 @@ static void _print_operation(Line *line) {
 }
 
 static void _print_directive(Line *line) {
-  printf("%s", directive_map[line->line.directive.type].token);
+  printf("%s ", directive_map[line->line.directive.type].token);
 
   if (line->line.directive.has_operand) {
     switch (line->line.directive.operand.type) {
@@ -260,7 +290,7 @@ static void _print_directive(Line *line) {
         printf("%s", line->line.directive.operand.operand.label);
         break;
       case OPT_STR:
-        printf("%s", line->line.directive.operand.operand.stringz);
+        printf("\"%s\"", line->line.directive.operand.operand.stringz);
         break;
       case OPERAND_INVALID:
         break;

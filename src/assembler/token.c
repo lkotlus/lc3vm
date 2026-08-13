@@ -16,12 +16,14 @@ static int _is_directive(const char *token, DirectiveTypeMap *dirtypemap);
 static Operand *_parse_operand_ival(const char *token, int is_dec);
 static Operand *_parse_operand_reg(Register reg);
 static Operand *_parse_operand_label(const char *token);
+static Operand *_parse_operand_stringz(const char *token);
 
 LabelResult parse_label(const char *token, LabelList *labell) {
   LabelMap *current = labell->head;
 
   while (current) {
-    if (strncmp(current->label, token, STRLEN) == 0) return LABEL_INVALID_DUPLICATE;
+    if (strncmp(current->label, token, STRLEN) == 0)
+      return LABEL_INVALID_DUPLICATE;
     current = current->next;
   }
 
@@ -35,6 +37,8 @@ Operand *parse_operand(const char *token) {
     return _parse_operand_ival(token, 1);
   } else if (_is_hex(token)) {
     return _parse_operand_ival(token, 0);
+  } else if (token[0] == '"') {
+    return _parse_operand_stringz(token);
   }
 
   for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); ++i) {
@@ -198,6 +202,16 @@ static Operand *_parse_operand_label(const char *token) {
 
   strncpy(operand->operand.label, token, STRLEN - 1);
   operand->operand.label[STRLEN - 1] = '\0';
+
+  return operand;
+}
+
+static Operand *_parse_operand_stringz(const char *token) {
+  Operand *operand = (Operand *)malloc(sizeof(Operand));
+
+  operand->type = OPT_STR;
+  strncpy(operand->operand.stringz, ++token, STRLEN);
+  operand->operand.stringz[STRLEN-1] = '\0';
 
   return operand;
 }
