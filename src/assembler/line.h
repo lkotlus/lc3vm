@@ -70,7 +70,7 @@ typedef struct {
 } LineList;
 
 Line *parse_line(FILE *f, int addr, LabelList *labell);
-int write_instruction(Line *line, LabelList *labell, uint16_t *inst, int i);
+int write_instructions(Line *line, LabelList *labell, uint16_t *inst, int i);
 void print_line(Line *line);
 
 #endif

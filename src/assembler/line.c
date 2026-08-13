@@ -88,7 +88,7 @@ Line *parse_line(FILE *f, int addr, LabelList *labell) {
   return line;
 }
 
-int write_instruction(Line *line, LabelList *labell, uint16_t *inst, int i) {
+int write_instructions(Line *line, LabelList *labell, uint16_t *inst, int i) {
   if (line->type == LINE_OPERATION) {
     return _assemble_operation(line, labell, inst, i);
   } else {
