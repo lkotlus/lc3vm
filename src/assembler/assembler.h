@@ -4,8 +4,8 @@
 #include "assembler/line.h"
 
 typedef struct {
-    Line* orig;
-    Line* current;
+    Line* head;
+    Line* tail;
 } LineList;
 
 typedef struct LabelMap LabelMap;
@@ -17,7 +17,7 @@ struct LabelMap {
 
 typedef struct {
     LabelMap* head;
-    LabelMap* current;
+    LabelMap* tail;
 } LabelList;
 
 void assemble(const char* fpath);

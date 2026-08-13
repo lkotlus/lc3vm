@@ -26,8 +26,6 @@ Line* parse_line(FILE* f, int addr) {
     char token[STRLEN];
     char* fl = fline;
 
-    printf("%s\n", fline);
-
     _get_token(&fl, token);
 
     if (parse_label(token) == LABEL_VALID) {
