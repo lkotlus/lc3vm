@@ -6,70 +6,43 @@
 #include "assembler/token.h"
 #include "assembler/assembler.h"
 
+static int _first_pass(FILE* file, LabelList* labell, LineList* linel);
 static LabelMap* _label_map_factory(char* label, uint16_t addr);
+static void _labell_push(LabelList* labell, LabelMap* lmap);
+static void _linel_push(LineList* linel, Line* line);
 
 void assemble(const char* fpath) {
     FILE* file = fopen(fpath, "r");
     LabelList labell = {NULL, NULL};
-    
+    LineList linel = {NULL, NULL};
+    int errors;
+
+    errors = _first_pass(file, &labell, &linel);
+
+    if (errors) {
+        // Do some things.
+        printf("HAD ERRORS :(\n");
+    }
+
+    fclose(file);
+}
+
+static int _first_pass(FILE* file, LabelList* labell, LineList* linel) {
     for (Line* line = parse_line(file, -1); line; line = parse_line(file, (int)(line->addr+1))) {
-        printf("0x%x\t\t", line->addr);
-
         if (line->label[0]) {
-            printf("%s ", line->label);
-            if (!labell.head) {
-                labell.head = _label_map_factory(line->label, line->addr);
-                labell.current = labell.head;
-            }
-        } 
-
-        if (line->type == LINE_OPERATION) {
-            printf("%d ", line->line.operation.opcode);
-
-            for (int i = 0; i < line->line.operation.n_ops; i++) {
-                switch (line->line.operation.operands[i].type) {
-                    case OPT_REG: 
-                        printf("%d", line->line.operation.operands[i].operand.reg);
-                        break;
-                    case OPT_LAB:
-                        printf("%s", line->line.operation.operands[i].operand.label);
-                        break;
-                    case OPT_IVA:
-                        printf("%d", line->line.operation.operands[i].operand.ival);
-                        break;
-                    case OPT_STR: break;
-                    case OPERAND_INVALID: printf("OPERAND INVALID\n"); break;
-                }
-
-                if (i != line->line.operation.n_ops - 1) printf(",");
-                printf(" ");
-            }
+            _labell_push(labell, _label_map_factory(line->label, line->addr));
         }
-        else {
-            printf("%d ", line->line.directive.type);
 
-            switch (line->line.directive.has_operand) {
-                case OPT_REG: 
-                    printf("%d", line->line.directive.operand.operand.reg);
-                    break;
-                case OPT_LAB:
-                    printf("%s", line->line.directive.operand.operand.label);
-                    break;
-                case OPT_IVA:
-                    printf("%d", line->line.directive.operand.operand.ival);
-                    break;
-                case OPT_STR:
-                    printf("%s", line->line.directive.operand.operand.stringz);
-                    break;
-                case OPERAND_INVALID: 
-                    break;
-            }
+        _linel_push(linel, line);
+
+        if (!(line->err == LINE_ERR_NONE)) {
+            return 1;
         }
 
         printf("\n");
-    };
+    }
 
-    fclose(file);
+    return 0;
 }
 
 static LabelMap* _label_map_factory(char* label, uint16_t addr) {
@@ -81,4 +54,25 @@ static LabelMap* _label_map_factory(char* label, uint16_t addr) {
     lmap->next = NULL;
 
     return lmap;
+}
+
+static void _labell_push(LabelList* labell, LabelMap* lmap) {
+    if (!labell->head) {
+        labell->head = lmap;
+        labell->current = labell->head;
+    }
+    else {
+        labell->current->next = lmap;
+        labell->current = labell->current->next;
+    }
+}
+static void _linel_push(LineList* linel, Line* line) {
+    if (!linel->orig) {
+        linel->orig = line;
+        linel->current = line;
+    }
+    else {
+        linel->current->next = line;
+        linel->current = linel->current->next;
+    }
 }
