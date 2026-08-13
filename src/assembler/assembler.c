@@ -54,10 +54,6 @@ static int _first_pass(FILE *file, LabelList *labell, LineList *linel) {
     _linel_push(linel, line);
 
     if (!(line->err == LINE_ERR_NONE)) {
-      printf("%s\n", line_types[line->type]);
-      printf("%s\n", line_errs[line->err]);
-      printf("%s\n", operation_errs[line->line.operation.err]);
-      printf("%s\n", directive_errs[line->line.directive.err]);
       return -1;
     }
 

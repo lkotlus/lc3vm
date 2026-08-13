@@ -214,12 +214,7 @@ static Directive *_get_directive(char **fl, DirectiveTypeMap *dirtypemap) {
 }
 
 static void _print_operation(Line *line) {
-  for (int i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); ++i) {
-    if (line->line.operation.opcode == opcode_map[i].opcode) {
-      printf("%s ", opcode_map[i].token);
-      break;
-    }
-  }
+  printf("%s ", opcode_map[line->line.operation.opcode].token);
 
   for (int i = 0; i < line->line.operation.n_ops; ++i) {
     switch (line->line.operation.operands[i].type) {
@@ -227,11 +222,7 @@ static void _print_operation(Line *line) {
         printf("0x%x", line->line.operation.operands[i].operand.ival);
         break;
       case OPT_REG:
-        for (int j = 0; j < (int)(sizeof(reg_map) / sizeof(reg_map[0])); ++j) {
-          if (line->line.operation.operands[i].operand.reg == reg_map[j].reg) {
-            printf("%s", reg_map[j].token);
-          }
-        }
+        printf("%s", reg_map[line->line.operation.operands[i].operand.reg].token);
         break;
       case OPT_LAB:
         printf("%s", line->line.operation.operands[i].operand.label);
@@ -251,13 +242,7 @@ static void _print_operation(Line *line) {
 }
 
 static void _print_directive(Line *line) {
-  for (int i = 0; i < (int)(sizeof(directive_map) / sizeof(directive_map[0]));
-       ++i) {
-    if (line->line.directive.type == directive_map[i].dirtype) {
-      printf("%s ", directive_map[i].token);
-      break;
-    }
-  }
+  printf("%s", directive_map[line->line.directive.type].token);
 
   if (line->line.directive.has_operand) {
     switch (line->line.directive.operand.type) {
