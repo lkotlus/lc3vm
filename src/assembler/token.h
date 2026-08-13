@@ -9,7 +9,7 @@ typedef enum {
     LABEL_INVALID
 } LabelResult;
 
-LabelResult parse_label(const char* token);
+LabelResult parse_label(const char *token);
 
 // Operands
 typedef enum {
@@ -36,7 +36,7 @@ typedef struct {
 } Operand;
 
 typedef struct {
-    const char* token;
+    const char *token;
     Register reg;
 } RegisterMap;
 
@@ -45,7 +45,7 @@ static const RegisterMap reg_map[] = {
     {"R4", R4}, {"R5", R5}, {"R6", R6}, {"R7", R7}
 };
 
-Operand* parse_operand(const char* token);
+Operand* parse_operand(const char *token);
 
 typedef enum {
     ADD, AND, NOT, LD,
@@ -65,7 +65,7 @@ typedef struct {
 } OperationSpec;
 
 typedef struct {
-    const char* token;
+    const char *token;
     OperationCode opcode;
     OperationSpec opspec;
 } OperationCodeMap;
@@ -102,13 +102,13 @@ static const OperationCodeMap opcode_map[] = {
     {"",      OPCODE_INVALID, {0, 0, {0, 0, 0}}                           }
 };
 
-OperationCodeMap* parse_opcode(const char* token);
+OperationCodeMap* parse_opcode(const char *token);
 
 // Directives
 typedef enum { ORIG, END, FILL, BLKW, STRINGZ, DIRECTIVE_INVALID } DirectiveType;
 
 typedef struct {
-    const char* token;
+    const char *token;
     DirectiveType dirtype;
     OperandType operand;
 } DirectiveTypeMap;
@@ -122,6 +122,6 @@ static const DirectiveTypeMap directive_map[] = {
     {"",         DIRECTIVE_INVALID, OPERAND_INVALID }
 };
 
-DirectiveTypeMap* parse_dirtype(const char* token);
+DirectiveTypeMap* parse_dirtype(const char *token);
 
 #endif
