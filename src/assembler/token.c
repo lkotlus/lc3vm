@@ -132,7 +132,6 @@ static int _is_opcode(const char *token, OperationCodeMap *opcodemap) {
 
   for (i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); ++i) {
     if (strcmp(token, opcode_map[i].token) == 0) {
-      printf("%s\n", token);
       if (opcodemap) *opcodemap = opcode_map[i];
       return 1;
     }

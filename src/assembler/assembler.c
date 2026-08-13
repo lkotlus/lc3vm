@@ -31,6 +31,7 @@ void assemble(const char *fpath) {
   }
 
   _print_labell(&labell);
+  printf("\n");
   _print_linel(&linel);
 
   // uint16_t instructions[n_lines];

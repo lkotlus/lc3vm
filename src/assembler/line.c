@@ -139,7 +139,7 @@ static int _get_token(char **fline, char *token) {
 
   while (**fline != '\0') {
     while (!isspace(**fline) && **fline != ',' && **fline != '\0') {
-      token[i++] = *++(*fline);
+      token[i++] = *((*fline)++); // Someone ought to lock me up for this.
     }
     if (i > 0) {
       token[i] = '\0';
@@ -246,6 +246,8 @@ static void _print_operation(Line *line) {
       printf(", ");
     }
   }
+
+  printf("\n");
 }
 
 static void _print_directive(Line *line) {
@@ -274,4 +276,6 @@ static void _print_directive(Line *line) {
         break;
     }
   }
+
+  printf("\n");
 }
