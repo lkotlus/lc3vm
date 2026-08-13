@@ -9,8 +9,7 @@
 #include "assembler/token.h"
 
 static int _first_pass(FILE *file, LabelList *labell, LineList *linel);
-static int _second_pass(LabelList *labell, LineList *linel,
-                        uint16_t instructions[]);
+static int _second_pass(LineList *linel, LabelList *labell, uint16_t inst[]);
 static LabelMap *_label_map_factory(char *label, uint16_t addr);
 static void _labell_push(LabelList *labell, LabelMap *lmap);
 static void _linel_push(LineList *linel, Line *line);
@@ -24,11 +23,11 @@ void assemble(const char *fpath) {
   LabelList labell = {NULL, NULL};
   LineList linel = {NULL, NULL};
 
-  int n_lines = _first_pass(file, &labell, &linel);
+  int words = _first_pass(file, &labell, &linel);
 
-  if (n_lines < 0) {
+  if (words < 0) {
     // Do some things.
-    printf("HAD ERRORS :(\n");
+    printf("ENCOUNTERED ERRORS!\n");
     return;
   }
 
@@ -36,7 +35,8 @@ void assemble(const char *fpath) {
   printf("\n");
   _print_linel(&linel);
 
-  // uint16_t instructions[n_lines];
+  uint16_t instructions[words];
+  _second_pass(&linel, &labell, instructions);
 
   _free_labell(&labell);
   _free_linel(&linel);
@@ -45,7 +45,7 @@ void assemble(const char *fpath) {
 }
 
 static int _first_pass(FILE *file, LabelList *labell, LineList *linel) {
-  int n_lines = 0;
+  int words = 0;
 
   for (Line *line = parse_line(file, -1, labell); line;
        line = parse_line(file, (int)(line->addr + 1), labell)) {
@@ -59,10 +59,41 @@ static int _first_pass(FILE *file, LabelList *labell, LineList *linel) {
       return -1;
     }
 
-    ++n_lines;
+    if (line->type == LINE_OPERATION) {
+      ++words;
+    } else {
+      switch (line->line.directive.type) {
+        case ORIG:
+          ++words;
+          break;
+        case FILL:
+          ++words;
+          break;
+        case BLKW:
+          words += line->line.directive.operand.operand.ival;
+          break;
+        case STRINGZ:
+          words += strlen(line->line.directive.operand.operand.stringz);
+          break;
+        case END: return words;
+        case DIRECTIVE_INVALID: break;
+      }
+    }
   }
 
-  return n_lines;
+  return words;
+}
+
+static int _second_pass(LineList *linel, LabelList *labell, uint16_t inst[]) {
+  Line *current = linel->head;
+  int i = 0;
+
+  while (current) {
+    write_instructions(current, labell, inst, i++);
+    current = current->next;
+  }
+
+  return 0;
 }
 
 static LabelMap *_label_map_factory(char *label, uint16_t addr) {

@@ -14,5 +14,21 @@
     "directory": "/home/lkotlus/Everything/Gramming/lc3vm",
     "file": "/home/lkotlus/Everything/Gramming/lc3vm/src/assembler/line.c",
     "output": "/home/lkotlus/Everything/Gramming/lc3vm/build/assembler/line.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-Isrc",
+      "-Wall",
+      "-Wextra",
+      "-std=c11",
+      "-c",
+      "-o",
+      "build/assembler/assembler.o",
+      "src/assembler/assembler.c"
+    ],
+    "directory": "/home/lkotlus/Everything/Gramming/lc3vm",
+    "file": "/home/lkotlus/Everything/Gramming/lc3vm/src/assembler/assembler.c",
+    "output": "/home/lkotlus/Everything/Gramming/lc3vm/build/assembler/assembler.o"
   }
 ]
