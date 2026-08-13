@@ -29,7 +29,9 @@ void assemble(const char* fpath) {
     }
 
     _print_labell(&labell);
-    uint16_t instructions[n_lines];
+    _print_linel(&linel);
+    
+    //uint16_t instructions[n_lines];
 
     _free_labell(&labell);
     _free_linel(&linel);
@@ -48,6 +50,10 @@ static int _first_pass(FILE* file, LabelList* labell, LineList* linel) {
         _linel_push(linel, line);
 
         if (!(line->err == LINE_ERR_NONE)) {
+            printf("%s\n", line_types[line->type]);
+            printf("%s\n", line_errs[line->err]);
+            printf("%s\n", operation_errs[line->line.operation.err]);
+            printf("%s\n", directive_errs[line->line.directive.err]);
             return -1;
         }
         
@@ -127,5 +133,7 @@ static void _print_linel(LineList* linel) {
     Line* current = linel->head;
 
     while (current) {
+        print_line(current);
+        current = current->next;
     }
 }
