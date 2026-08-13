@@ -51,7 +51,7 @@ static int _first_pass(FILE* file, LabelList* labell, LineList* linel) {
             return -1;
         }
         
-        n_lines++;
+        ++n_lines;
     }
 
     return n_lines;

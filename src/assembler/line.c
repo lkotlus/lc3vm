@@ -14,6 +14,8 @@ static void _skip_comment(FILE* f, int* ch);
 static int _get_token(char** line, char* token);
 static Operation* _get_operation(char** fl, OperationCodeMap* opcodemap);
 static Directive* _get_directive(char** fl, DirectiveTypeMap* dirtypemap);
+static void _print_operation(Line* line);
+static void _print_directive(Line* line);
 
 Line* parse_line(FILE* f, int addr) {
     Line* line = _line_factory();
@@ -65,6 +67,17 @@ Line* parse_line(FILE* f, int addr) {
     return line;
 }
 
+void print_line(Line* line) {
+    printf("%s\t", line->label);
+
+    if (line->type == LINE_OPERATION) {
+        _print_operation(line);
+    }
+    else {
+        _print_directive(line);
+    }
+}
+
 static Line* _line_factory() {
     Line* line = (Line*)malloc(sizeof(Line));
 
@@ -112,14 +125,14 @@ static int _get_token(char** fline, char* token) {
 
     while (**fline != '\0') {
         while (!isspace(**fline) && **fline != ',' && **fline != '\0') {
-            token[i++] = *(*fline)++;
+            token[i++] = *++(*fline);
         }
         if (i > 0) {
             token[i] = '\0';
             return 1;
         }
 
-        (*fline)++;
+        ++(*fline);
     }
 
     token[i] = '\0';
@@ -133,7 +146,7 @@ static Operation* _get_operation(char** fl, OperationCodeMap* opcodemap) {
     op->opcode = opcodemap->opcode;
     op->n_ops = opcodemap->opspec.n_ops;
 
-    for (int i = 0; i < opcodemap->opspec.n_ops; i++) {
+    for (int i = 0; i < opcodemap->opspec.n_ops; ++i) {
         Operand* operand;
         
         if (!_get_token(fl, token)) {
@@ -184,4 +197,21 @@ static Directive* _get_directive(char** fl, DirectiveTypeMap* dirtypemap) {
     }
 
     return dir;
+}
+
+static void _print_operation(Line* line) {
+    for (int i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); ++i) {
+        if (line->line.operation.opcode == opcode_map[i].opcode) {
+            printf("%s ", opcode_map[i].token);
+            break;
+        }
+    }
+
+    for (int i = 0; i < line->line.operation.n_ops; ++i) {
+
+    }
+}
+
+static void _print_directive(Line* line) {
+
 }

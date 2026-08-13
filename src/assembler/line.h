@@ -62,5 +62,6 @@ struct Line {
 };
 
 Line* parse_line(FILE* f, int addr);
+void print_line(Line* line);
 
 #endif

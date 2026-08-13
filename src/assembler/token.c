@@ -28,7 +28,7 @@ Operand* parse_operand(const char* token) {
         return _parse_operand_ival(token, 0);
     }
 
-    for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); i++) {
+    for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); ++i) {
         if (strcmp(token, reg_map[i].token) == 0) {
             return _parse_operand_reg(reg_map[i].reg);
         }
@@ -112,7 +112,7 @@ static int _is_hex(const char* token) {
 }
 
 static int _is_register(const char* token, Register* reg) {
-    for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); i++) {
+    for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); ++i) {
         if (strcmp(token, reg_map[i].token) == 0) {
             if (reg) *reg = reg_map[i].reg;
             return 1;
@@ -125,7 +125,7 @@ static int _is_register(const char* token, Register* reg) {
 static int _is_opcode(const char* token, OperationCodeMap* opcodemap) {
     int i;
 
-    for (i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); i++) {
+    for (i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); ++i) {
         if (strcmp(token, opcode_map[i].token) == 0) {
             if (opcodemap) *opcodemap = opcode_map[i];
             return 1;
@@ -139,7 +139,7 @@ static int _is_opcode(const char* token, OperationCodeMap* opcodemap) {
 static int _is_directive(const char* token, DirectiveTypeMap* dirtypemap) {
     int i;
 
-    for (i = 0; i < (int)(sizeof(directive_map) / sizeof(directive_map[0])); i++) {
+    for (i = 0; i < (int)(sizeof(directive_map) / sizeof(directive_map[0])); ++i) {
         if (strcmp(token, directive_map[i].token) == 0) {
             if (dirtypemap) *dirtypemap = directive_map[i];
             return 1;
