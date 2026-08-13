@@ -9,6 +9,8 @@
 #include "assembler/token.h"
 
 static int _first_pass(FILE *file, LabelList *labell, LineList *linel);
+static int _second_pass(LabelList *labell, LineList *linel,
+                        uint16_t instructions[]);
 static LabelMap *_label_map_factory(char *label, uint16_t addr);
 static void _labell_push(LabelList *labell, LabelMap *lmap);
 static void _linel_push(LineList *linel, Line *line);
@@ -45,8 +47,8 @@ void assemble(const char *fpath) {
 static int _first_pass(FILE *file, LabelList *labell, LineList *linel) {
   int n_lines = 0;
 
-  for (Line *line = parse_line(file, -1); line;
-       line = parse_line(file, (int)(line->addr + 1))) {
+  for (Line *line = parse_line(file, -1, labell); line;
+       line = parse_line(file, (int)(line->addr + 1), labell)) {
     if (line->label[0]) {
       _labell_push(labell, _label_map_factory(line->label, line->addr));
     }

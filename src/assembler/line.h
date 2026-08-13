@@ -41,6 +41,7 @@ typedef struct {
 typedef enum {
   LINE_ERR_NONE,
   LINE_ERR_INVALID_TOKEN,
+  LINE_ERR_DUPLICATE_LABEL,
   LINE_ERR_NO_ORIG,
   LINE_ERR_OP,
   LINE_ERR_DIR,
@@ -63,7 +64,12 @@ struct Line {
   Line *next;
 };
 
-Line *parse_line(FILE *f, int addr);
+typedef struct {
+  Line *head;
+  Line *tail;
+} LineList;
+
+Line *parse_line(FILE *f, int addr, LabelList *labell);
 void print_line(Line *line);
 
 #endif

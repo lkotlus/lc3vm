@@ -17,10 +17,17 @@ static Operand *_parse_operand_ival(const char *token, int is_dec);
 static Operand *_parse_operand_reg(Register reg);
 static Operand *_parse_operand_label(const char *token);
 
-LabelResult parse_label(const char *token) {
+LabelResult parse_label(const char *token, LabelList *labell) {
+  LabelMap *current = labell->head;
+
+  while (current) {
+    if (strncmp(current->label, token, STRLEN) == 0) return LABEL_INVALID_DUPLICATE;
+    current = current->next;
+  }
+
   if (_validate_label(token)) return LABEL_VALID;
 
-  return LABEL_INVALID;
+  return LABEL_INVALID_CHARS;
 }
 
 Operand *parse_operand(const char *token) {

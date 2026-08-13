@@ -5,9 +5,25 @@
 
 #include "constants.h"
 
-typedef enum { LABEL_VALID, LABEL_INVALID } LabelResult;
+typedef struct LabelMap LabelMap;
+struct LabelMap {
+  char label[STRLEN];
+  uint16_t addr;
+  LabelMap *next;
+};
 
-LabelResult parse_label(const char *token);
+typedef struct {
+  LabelMap *head;
+  LabelMap *tail;
+} LabelList;
+
+typedef enum {
+  LABEL_VALID,
+  LABEL_INVALID_DUPLICATE,
+  LABEL_INVALID_CHARS
+} LabelResult;
+
+LabelResult parse_label(const char *token, LabelList *labell);
 
 // Operands
 typedef enum {

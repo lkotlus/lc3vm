@@ -10,8 +10,12 @@
 #include "constants.h"
 
 const char *line_errs[] = {
-    "LINE_ERR_NONE", "LINE_ERR_INVALID_TOKEN", "LINE_ERR_NO_ORIG",
-    "LINE_ERR_OP",   "LINE_ERR_DIR",
+    "LINE_ERR_NONE",
+    "LINE_ERR_INVALID_TOKEN",
+    "LINE_ERR_DUPLICATE_LABEL",
+    "LINE_ERR_NO_ORIG",
+    "LINE_ERR_OP",
+    "LINE_ERR_DIR",
 };
 const char *operation_errs[] = {"OP_ERR_NONE", "OP_ERR_TOO_MANY_OPERANDS",
                                 "OP_ERR_TOO_FEW_OPERANDS",
@@ -31,7 +35,7 @@ static Directive *_get_directive(char **fl, DirectiveTypeMap *dirtypemap);
 static void _print_operation(Line *line);
 static void _print_directive(Line *line);
 
-Line *parse_line(FILE *f, int addr) {
+Line *parse_line(FILE *f, int addr, LabelList *labell) {
   Line *line = _line_factory();
   char fline[STRLEN];
 
@@ -44,7 +48,7 @@ Line *parse_line(FILE *f, int addr) {
 
   _get_token(&fl, token);
 
-  if (parse_label(token) == LABEL_VALID) {
+  if (parse_label(token, labell) == LABEL_VALID) {
     strncpy(line->label, token, STRLEN - 1);
     line->label[STRLEN - 1] = '\0';
 
@@ -139,7 +143,7 @@ static int _get_token(char **fline, char *token) {
 
   while (**fline != '\0') {
     while (!isspace(**fline) && **fline != ',' && **fline != '\0') {
-      token[i++] = *((*fline)++); // Someone ought to lock me up for this.
+      token[i++] = *((*fline)++);  // Someone ought to lock me up for this.
     }
     if (i > 0) {
       token[i] = '\0';
@@ -222,7 +226,8 @@ static void _print_operation(Line *line) {
         printf("0x%x", line->line.operation.operands[i].operand.ival);
         break;
       case OPT_REG:
-        printf("%s", reg_map[line->line.operation.operands[i].operand.reg].token);
+        printf("%s",
+               reg_map[line->line.operation.operands[i].operand.reg].token);
         break;
       case OPT_LAB:
         printf("%s", line->line.operation.operands[i].operand.label);
