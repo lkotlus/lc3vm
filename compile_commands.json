@@ -1,7 +1,7 @@
 [
   {
     "arguments": [
-      "/usr/bin/gcc",
+      "/usr/bin/clang",
       "-Isrc",
       "-Wall",
       "-Wextra",
@@ -17,7 +17,7 @@
   },
   {
     "arguments": [
-      "/usr/bin/gcc",
+      "/usr/bin/clang",
       "-Isrc",
       "-Wall",
       "-Wextra",
@@ -30,5 +30,69 @@
     "directory": "/home/lkotlus/Everything/Gramming/lc3vm",
     "file": "/home/lkotlus/Everything/Gramming/lc3vm/src/assembler/assembler.c",
     "output": "/home/lkotlus/Everything/Gramming/lc3vm/build/assembler/assembler.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-Isrc",
+      "-Wall",
+      "-Wextra",
+      "-std=c11",
+      "-c",
+      "-o",
+      "build/assembler/token.o",
+      "src/assembler/token.c"
+    ],
+    "directory": "/home/lkotlus/Everything/Gramming/lc3vm",
+    "file": "/home/lkotlus/Everything/Gramming/lc3vm/src/assembler/token.c",
+    "output": "/home/lkotlus/Everything/Gramming/lc3vm/build/assembler/token.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-Isrc",
+      "-Wall",
+      "-Wextra",
+      "-std=c11",
+      "-c",
+      "-o",
+      "build/vm/vm.o",
+      "src/vm/vm.c"
+    ],
+    "directory": "/home/lkotlus/Everything/Gramming/lc3vm",
+    "file": "/home/lkotlus/Everything/Gramming/lc3vm/src/vm/vm.c",
+    "output": "/home/lkotlus/Everything/Gramming/lc3vm/build/vm/vm.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-Isrc",
+      "-Wall",
+      "-Wextra",
+      "-std=c11",
+      "-c",
+      "-o",
+      "build/disassembler/disassembler.o",
+      "src/disassembler/disassembler.c"
+    ],
+    "directory": "/home/lkotlus/Everything/Gramming/lc3vm",
+    "file": "/home/lkotlus/Everything/Gramming/lc3vm/src/disassembler/disassembler.c",
+    "output": "/home/lkotlus/Everything/Gramming/lc3vm/build/disassembler/disassembler.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang",
+      "-Isrc",
+      "-Wall",
+      "-Wextra",
+      "-std=c11",
+      "-c",
+      "-o",
+      "build/main.o",
+      "src/main.c"
+    ],
+    "directory": "/home/lkotlus/Everything/Gramming/lc3vm",
+    "file": "/home/lkotlus/Everything/Gramming/lc3vm/src/main.c",
+    "output": "/home/lkotlus/Everything/Gramming/lc3vm/build/main.o"
   }
 ]
