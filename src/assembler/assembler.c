@@ -1,10 +1,12 @@
 #include "assembler/assembler.h"
-#include "assembler/line.h"
-#include "assembler/token.h"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "assembler/line.h"
+#include "assembler/token.h"
 
 static int _first_pass(FILE *file, LabelList *labell, LineList *linel);
 static LabelMap *_label_map_factory(char *label, uint16_t addr);

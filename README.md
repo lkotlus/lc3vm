@@ -66,4 +66,4 @@ Features that I need to support
 - Don't even talk to me
 
 # Lint
-`clang-format -i --style="{BasedOnStyle: llvm, PointerAlignment: Right}" src/**/*.c src/**/*.h`
+`clang-format -i --style=Google src/**/*.c src/**/*.h`

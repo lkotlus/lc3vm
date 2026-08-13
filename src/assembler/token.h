@@ -1,8 +1,9 @@
 #ifndef TOKEN
 #define TOKEN
 
-#include "constants.h"
 #include <stdint.h>
+
+#include "constants.h"
 
 typedef enum { LABEL_VALID, LABEL_INVALID } LabelResult;
 

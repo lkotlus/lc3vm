@@ -1,9 +1,11 @@
 #include "assembler/token.h"
-#include "constants.h"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "constants.h"
 
 static int _validate_label(const char *token);
 static int _is_dec(const char *token);
@@ -16,8 +18,7 @@ static Operand *_parse_operand_reg(Register reg);
 static Operand *_parse_operand_label(const char *token);
 
 LabelResult parse_label(const char *token) {
-  if (_validate_label(token))
-    return LABEL_VALID;
+  if (_validate_label(token)) return LABEL_VALID;
 
   return LABEL_INVALID;
 }
@@ -55,16 +56,11 @@ DirectiveTypeMap *parse_dirtype(const char *token) {
 }
 
 static int _validate_label(const char *token) {
-  if (_is_hex(token))
-    return 0;
-  if (_is_register(token, NULL))
-    return 0;
-  if (_is_opcode(token, NULL))
-    return 0;
-  if (_is_directive(token, NULL))
-    return 0;
-  if (!(token[0] >= 'A' && token[0] <= 'Z'))
-    return 0;
+  if (_is_hex(token)) return 0;
+  if (_is_register(token, NULL)) return 0;
+  if (_is_opcode(token, NULL)) return 0;
+  if (_is_directive(token, NULL)) return 0;
+  if (!(token[0] >= 'A' && token[0] <= 'Z')) return 0;
 
   int i = 1;
   char c = token[i];
@@ -123,8 +119,7 @@ static int _is_hex(const char *token) {
 static int _is_register(const char *token, Register *reg) {
   for (int i = 0; i < (int)(sizeof(reg_map) / sizeof(reg_map[0])); ++i) {
     if (strcmp(token, reg_map[i].token) == 0) {
-      if (reg)
-        *reg = reg_map[i].reg;
+      if (reg) *reg = reg_map[i].reg;
       return 1;
     }
   }
@@ -138,14 +133,12 @@ static int _is_opcode(const char *token, OperationCodeMap *opcodemap) {
   for (i = 0; i < (int)(sizeof(opcode_map) / sizeof(opcode_map[0])); ++i) {
     if (strcmp(token, opcode_map[i].token) == 0) {
       printf("%s\n", token);
-      if (opcodemap)
-        *opcodemap = opcode_map[i];
+      if (opcodemap) *opcodemap = opcode_map[i];
       return 1;
     }
   }
 
-  if (opcodemap)
-    *opcodemap = opcode_map[i - 1];
+  if (opcodemap) *opcodemap = opcode_map[i - 1];
   return 0;
 }
 
@@ -155,14 +148,12 @@ static int _is_directive(const char *token, DirectiveTypeMap *dirtypemap) {
   for (i = 0; i < (int)(sizeof(directive_map) / sizeof(directive_map[0]));
        ++i) {
     if (strcmp(token, directive_map[i].token) == 0) {
-      if (dirtypemap)
-        *dirtypemap = directive_map[i];
+      if (dirtypemap) *dirtypemap = directive_map[i];
       return 1;
     }
   }
 
-  if (dirtypemap)
-    *dirtypemap = directive_map[i - 1];
+  if (dirtypemap) *dirtypemap = directive_map[i - 1];
   return 0;
 }
 

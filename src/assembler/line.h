@@ -1,8 +1,9 @@
 #ifndef LINE
 #define LINE
 
-#include "assembler/token.h"
 #include <stdio.h>
+
+#include "assembler/token.h"
 
 // Operations
 typedef enum {

@@ -1,22 +1,24 @@
 #include "assembler/line.h"
-#include "assembler/token.h"
-#include "constants.h"
+
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "assembler/token.h"
+#include "constants.h"
+
 const char *line_errs[] = {
     "LINE_ERR_NONE", "LINE_ERR_INVALID_TOKEN", "LINE_ERR_NO_ORIG",
     "LINE_ERR_OP",   "LINE_ERR_DIR",
 };
-const char *operation_errs[] = {
-    "OP_ERR_NONE", "OP_ERR_TOO_MANY_OPERANDS", "OP_ERR_TOO_FEW_OPERANDS",
-    "OP_ERR_WRONG_TYPE_OPERANDS"};
-const char *directive_errs[] = {
-    "DIR_ERR_NONE", "DIR_ERR_TOO_MANY_OPERANDS", "DIR_ERR_TOO_FEW_OPERANDS",
-    "DIR_ERR_WRONG_TYPE_OPERANDS"};
+const char *operation_errs[] = {"OP_ERR_NONE", "OP_ERR_TOO_MANY_OPERANDS",
+                                "OP_ERR_TOO_FEW_OPERANDS",
+                                "OP_ERR_WRONG_TYPE_OPERANDS"};
+const char *directive_errs[] = {"DIR_ERR_NONE", "DIR_ERR_TOO_MANY_OPERANDS",
+                                "DIR_ERR_TOO_FEW_OPERANDS",
+                                "DIR_ERR_WRONG_TYPE_OPERANDS"};
 const char *line_types[] = {"LINE_OPERATION", "LINE_DIRECTIVE"};
 
 // Gets the next line of a file that contains a token
@@ -56,15 +58,13 @@ Line *parse_line(FILE *f, int addr) {
     line->type = LINE_OPERATION;
     line->line.operation = *op;
 
-    if (op->err != OP_ERR_NONE)
-      line->err = LINE_ERR_OP;
+    if (op->err != OP_ERR_NONE) line->err = LINE_ERR_OP;
   } else if (dirtypemap->dirtype != DIRECTIVE_INVALID) {
     Directive *dir = _get_directive(&fl, dirtypemap);
     line->type = LINE_DIRECTIVE;
     line->line.directive = *dir;
 
-    if (dir->err != DIR_ERR_NONE)
-      line->err = LINE_ERR_DIR;
+    if (dir->err != DIR_ERR_NONE) line->err = LINE_ERR_DIR;
   } else {
     line->err = LINE_ERR_INVALID_TOKEN;
     return line;
@@ -130,8 +130,7 @@ static int _get_fline(FILE *f, char *fline) {
 
 static void _skip_comment(FILE *f, int *ch) {
   if (*ch == ';') {
-    while (((*ch = toupper(fgetc(f))) != EOF) && *ch != '\n')
-      ;
+    while (((*ch = toupper(fgetc(f))) != EOF) && *ch != '\n');
   }
 }
 
@@ -180,8 +179,7 @@ static Operation *_get_operation(char **fl, OperationCodeMap *opcodemap) {
     op->operands[i] = *operand;
   }
 
-  if (_get_token(fl, token))
-    op->err = OP_ERR_TOO_MANY_OPERANDS;
+  if (_get_token(fl, token)) op->err = OP_ERR_TOO_MANY_OPERANDS;
 
   return op;
 }
@@ -225,23 +223,23 @@ static void _print_operation(Line *line) {
 
   for (int i = 0; i < line->line.operation.n_ops; ++i) {
     switch (line->line.operation.operands[i].type) {
-    case OPT_IVA:
-      printf("0x%x", line->line.operation.operands[i].operand.ival);
-      break;
-    case OPT_REG:
-      for (int j = 0; j < (int)(sizeof(reg_map) / sizeof(reg_map[0])); ++j) {
-        if (line->line.operation.operands[i].operand.reg == reg_map[j].reg) {
-          printf("%s", reg_map[j].token);
+      case OPT_IVA:
+        printf("0x%x", line->line.operation.operands[i].operand.ival);
+        break;
+      case OPT_REG:
+        for (int j = 0; j < (int)(sizeof(reg_map) / sizeof(reg_map[0])); ++j) {
+          if (line->line.operation.operands[i].operand.reg == reg_map[j].reg) {
+            printf("%s", reg_map[j].token);
+          }
         }
-      }
-      break;
-    case OPT_LAB:
-      printf("%s", line->line.operation.operands[i].operand.label);
-      break;
-    case OPT_STR:
-      break;
-    case OPERAND_INVALID:
-      break;
+        break;
+      case OPT_LAB:
+        printf("%s", line->line.operation.operands[i].operand.label);
+        break;
+      case OPT_STR:
+        break;
+      case OPERAND_INVALID:
+        break;
     }
 
     if (i < line->line.operation.n_ops - 1) {
@@ -261,19 +259,19 @@ static void _print_directive(Line *line) {
 
   if (line->line.directive.has_operand) {
     switch (line->line.directive.operand.type) {
-    case OPT_IVA:
-      printf("0x%x", line->line.directive.operand.operand.ival);
-      break;
-    case OPT_REG:
-      break;
-    case OPT_LAB:
-      printf("%s", line->line.directive.operand.operand.label);
-      break;
-    case OPT_STR:
-      printf("%s", line->line.directive.operand.operand.stringz);
-      break;
-    case OPERAND_INVALID:
-      break;
+      case OPT_IVA:
+        printf("0x%x", line->line.directive.operand.operand.ival);
+        break;
+      case OPT_REG:
+        break;
+      case OPT_LAB:
+        printf("%s", line->line.directive.operand.operand.label);
+        break;
+      case OPT_STR:
+        printf("%s", line->line.directive.operand.operand.stringz);
+        break;
+      case OPERAND_INVALID:
+        break;
     }
   }
 }
