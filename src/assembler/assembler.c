@@ -30,6 +30,7 @@ void assemble(const char *fpath) {
   if (words < 0) {
     printf("ENCOUNTERED ERRORS!\n");
     printf("\tLine error: %s\n", line_errs[linel.tail->err]);
+
     if (linel.tail->type == LINE_OPERATION) {
       printf("\tOperation error: %s\n",
              operation_errs[linel.tail->line.operation->err]);
@@ -37,6 +38,11 @@ void assemble(const char *fpath) {
       printf("\tDirective error: %s\n",
              directive_errs[linel.tail->line.directive->err]);
     }
+
+    _free_labell(&labell);
+    _free_linel(&linel);
+    fclose(file);
+
     return;
   }
 

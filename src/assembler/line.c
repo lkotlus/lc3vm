@@ -65,6 +65,9 @@ Line *parse_line(FILE *f, int addr, LabelList *labell) {
     return line;
   }
 
+  free(opcodemap);
+  free(dirtypemap);
+
   if (line->err != LINE_ERR_NONE) {
     return line;
   }

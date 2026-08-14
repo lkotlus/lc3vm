@@ -25,6 +25,8 @@ int main(int argv, char* args[]) {
         printf("Running %s...\n", flags->inpath);
     }
 
+    free(flags);
+
     return 0;
 }
 
