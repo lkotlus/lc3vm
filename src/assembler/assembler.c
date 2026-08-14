@@ -47,6 +47,7 @@ void assemble(const char *fpath) {
 
 static int _first_pass(FILE *file, LabelList *labell, LineList *linel) {
   int words = 0;
+  printf("CALLED FIRST PASS\n");
 
   for (Line *line = parse_line(file, -1, labell); line;
        line = parse_line(file, (int)(line->addr + 1), labell)) {
@@ -76,10 +77,14 @@ static int _first_pass(FILE *file, LabelList *labell, LineList *linel) {
         case STRINGZ:
           words += strlen(line->line.directive->operand->operand.stringz);
           break;
-        case END: return words;
-        case DIRECTIVE_INVALID: break;
+        case END:
+          return words;
+        case DIRECTIVE_INVALID:
+          break;
       }
     }
+
+    print_line(line);
   }
 
   return words;

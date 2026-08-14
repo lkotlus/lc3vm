@@ -34,9 +34,11 @@ static Operation *_get_operation(char **fl, OperationCodeMap *opcodemap);
 static Directive *_get_directive(char **fl, DirectiveTypeMap *dirtypemap);
 static void _print_operation(Line *line);
 static void _print_directive(Line *line);
-static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[], int i);
-static int _assemble_directive(Line *line, LabelList *labell, uint16_t inst[], int i);
-static void _convert_label(Line *label_operand, LabelList* labell, int i);
+static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[],
+                               int i);
+static int _assemble_directive(Line *line, LabelList *labell, uint16_t inst[],
+                               int i);
+static void _convert_label(Line *label_operand, LabelList *labell, int i);
 static void _convert_label_operation(Line *line, LabelList *labell, int i);
 static void _convert_label_directive(Line *line, LabelList *labell);
 
@@ -171,11 +173,21 @@ static int _get_token(char **fline, char *token) {
           ++(*fline);
           char c = *((*fline)++);
           switch (c) {
-            case 'n':  token[i++] = '\n'; break;
-            case 't':  token[i++] = '\t'; break;
-            case 'r':  token[i++] = '\r'; break;
-            case '\\': token[i++] = '\\'; break;
-            case '"':  token[i++] = '"';  break;
+            case 'n':
+              token[i++] = '\n';
+              break;
+            case 't':
+              token[i++] = '\t';
+              break;
+            case 'r':
+              token[i++] = '\r';
+              break;
+            case '\\':
+              token[i++] = '\\';
+              break;
+            case '"':
+              token[i++] = '"';
+              break;
             default:
               token[i++] = c;
               break;
@@ -189,8 +201,10 @@ static int _get_token(char **fline, char *token) {
       return 1;
     }
 
-    while (!isspace(**fline) && **fline != ',' && **fline != '\0' && **fline != '"') {
-      token[i++] = toupper(*((*fline)++));  // Someone ought to lock me up for this.
+    while (!isspace(**fline) && **fline != ',' && **fline != '\0' &&
+           **fline != '"') {
+      token[i++] =
+          toupper(*((*fline)++));  // Someone ought to lock me up for this.
     }
     token[i] = '\0';
     return 1;
@@ -323,7 +337,8 @@ static void _print_directive(Line *line) {
   printf("\n");
 }
 
-static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[], int i) {
+static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[],
+                               int i) {
   for (int i = 0; i < line->line.operation->n_ops; ++i) {
     if (line->line.operation->operands[i]->type == OPT_LAB) {
       _convert_label(line, labell, i);
@@ -334,8 +349,10 @@ static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[], i
   return 1;
 }
 
-static int _assemble_directive(Line *line, LabelList *labell, uint16_t inst[], int i) {
-  if (line->line.directive->has_operand && line->line.directive->operand->type == OPT_LAB) {
+static int _assemble_directive(Line *line, LabelList *labell, uint16_t inst[],
+                               int i) {
+  if (line->line.directive->has_operand &&
+      line->line.directive->operand->type == OPT_LAB) {
     _convert_label(line, labell, i);
   }
 
@@ -348,39 +365,48 @@ static int _assemble_directive(Line *line, LabelList *labell, uint16_t inst[], i
       return 1;
     case BLKW:
       for (int j = 0; j < line->line.directive->operand->operand.imm; ++j) {
-        inst[i+j] = 0x0000;
+        inst[i + j] = 0x0000;
       }
       return line->line.directive->operand->operand.imm;
     case STRINGZ:
-      for (int j = 0; j < (int)strlen(line->line.directive->operand->operand.stringz); ++j) {
-        inst[i+j] = (uint16_t)line->line.directive->operand->operand.stringz[j];
+      for (int j = 0;
+           j < (int)strlen(line->line.directive->operand->operand.stringz);
+           ++j) {
+        inst[i + j] =
+            (uint16_t)line->line.directive->operand->operand.stringz[j];
       }
       return strlen(line->line.directive->operand->operand.stringz);
-    case END: return 0;
-    case DIRECTIVE_INVALID: return 0;
+    case END:
+      return 0;
+    case DIRECTIVE_INVALID:
+      return 0;
   }
 }
 
-static void _convert_label(Line *line, LabelList* labell, int i) {
-  if (line->type == LINE_OPERATION) _convert_label_operation(line, labell, i);
-  else _convert_label_directive(line, labell);
+static void _convert_label(Line *line, LabelList *labell, int i) {
+  if (line->type == LINE_OPERATION)
+    _convert_label_operation(line, labell, i);
+  else
+    _convert_label_directive(line, labell);
 }
 
 static void _convert_label_operation(Line *line, LabelList *labell, int i) {
   LabelMap *current = labell->head;
 
-  while (strncmp(line->line.operation->operands[i]->operand.label, current->label, STRLEN)) {
+  while (strncmp(line->line.operation->operands[i]->operand.label,
+                 current->label, STRLEN)) {
     current = current->next;
   }
 
   if (!current) {
     line->line.operation->err = OP_ERR_NOMATCH_LABEL;
   } else {
-    line->line.operation->operands[i]->operand.imm = 
+    line->line.operation->operands[i]->operand.imm =
         (int16_t)(current->addr - (line->addr + 1));
 
     int i = 0;
-    for (i = 0; line->line.operation->operands[i]->operand.imm >= MAX_INTS[i]; ++i) {
+    for (i = 0; line->line.operation->operands[i]->operand.imm >= MAX_INTS[i];
+         ++i) {
       line->line.operation->operands[i]->type = IMM_MAP[i];
     }
 
@@ -392,7 +418,8 @@ static void _convert_label_directive(Line *line, LabelList *labell) {
   LabelMap *current = labell->head;
   line->line.directive->operand->type = OPT_IMM16;
 
-  while (strncmp(line->line.directive->operand->operand.label, current->label, STRLEN)) {
+  while (strncmp(line->line.directive->operand->operand.label, current->label,
+                 STRLEN)) {
     current = current->next;
   }
 

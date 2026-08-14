@@ -1,8 +1,8 @@
 #ifndef TOKEN
 #define TOKEN
 
-#include <stdint.h>
 #include <limits.h>
+#include <stdint.h>
 
 #include "constants.h"
 
@@ -13,28 +13,12 @@
 #define MAX_INT6 0x3F
 #define MAX_INT5 0x1F
 #define N_MAX_INTS 6
-#define MAX_INTS (        \
-    (const long int[]){        \
-        MAX_INT5,         \
-        MAX_INT6,         \
-        MAX_INT8,         \
-        MAX_INT9,         \
-        MAX_INT11,        \
-        MAX_INT16,        \
-        LONG_MAX          \
-    }                     \
-)
-#define IMM_MAP (         \
-    (const int[]){        \
-        OPT_IMM5,         \
-        OPT_OFFSET6,      \
-        OPT_TRAPVECT8,    \
-        OPT_PCOFFSET9,    \
-        OPT_PCOFFSET11,   \
-        OPT_IMM16,        \
-        OPERAND_INVALID   \
-    }                     \
-)
+#define MAX_INTS                                                         \
+  ((const long int[]){MAX_INT5, MAX_INT6, MAX_INT8, MAX_INT9, MAX_INT11, \
+                      MAX_INT16, LONG_MAX})
+#define IMM_MAP                                                       \
+  ((const int[]){OPT_IMM5, OPT_OFFSET6, OPT_TRAPVECT8, OPT_PCOFFSET9, \
+                 OPT_PCOFFSET11, OPT_IMM16, OPERAND_INVALID})
 
 typedef struct LabelMap LabelMap;
 struct LabelMap {
@@ -58,15 +42,15 @@ LabelResult parse_label(const char *token, LabelList *labell);
 
 // Operands
 typedef enum {
-  OPT_LAB         = 1 << 0,
-  OPT_REG         = 1 << 1,
-  OPT_IMM5        = 1 << 2,
-  OPT_PCOFFSET9   = 1 << 3,
-  OPT_PCOFFSET11  = 1 << 4,
-  OPT_OFFSET6     = 1 << 5,
-  OPT_TRAPVECT8   = 1 << 6,
-  OPT_STRINGZ     = 1 << 7,
-  OPT_IMM16       = 1 << 8,
+  OPT_LAB = 1 << 0,
+  OPT_REG = 1 << 1,
+  OPT_IMM5 = 1 << 2,
+  OPT_PCOFFSET9 = 1 << 3,
+  OPT_PCOFFSET11 = 1 << 4,
+  OPT_OFFSET6 = 1 << 5,
+  OPT_TRAPVECT8 = 1 << 6,
+  OPT_STRINGZ = 1 << 7,
+  OPT_IMM16 = 1 << 8,
   OPERAND_INVALID = 0
 } OperandType;
 

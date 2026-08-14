@@ -183,8 +183,10 @@ static Operand *_parse_operand_imm(const char *token, int is_dec) {
     operand->type |= IMM_MAP[i];
   }
 
-  if (i > 6) operand->type = OPERAND_INVALID;
-  else operand->operand.imm = (int16_t)imm;
+  if (i > 6)
+    operand->type = OPERAND_INVALID;
+  else
+    operand->operand.imm = (int16_t)imm;
 
   return operand;
 }
@@ -219,7 +221,7 @@ static Operand *_parse_operand_stringz(const char *token) {
 
   operand->type = OPT_STRINGZ;
   strncpy(operand->operand.stringz, ++token, STRLEN);
-  operand->operand.stringz[STRLEN-1] = '\0';
+  operand->operand.stringz[STRLEN - 1] = '\0';
 
   return operand;
 }
