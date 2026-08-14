@@ -15,6 +15,8 @@ static void _labell_push(LabelList *labell, LabelMap *lmap);
 static void _linel_push(LineList *linel, Line *line);
 static void _free_labell(LabelList *labell);
 static void _free_linel(LineList *linel);
+static void _free_operation(Operation *op);
+static void _free_directive(Directive *dir);
 static void _print_labell(LabelList *labell);
 static void _print_linel(LineList *linel);
 
@@ -158,8 +160,30 @@ static void _free_linel(LineList *linel) {
     old = current;
     current = current->next;
 
+    if (old->type == LINE_OPERATION) {
+      _free_operation(old->line.operation);
+    } else {
+      _free_directive(old->line.directive);
+    }
+
     free(old);
   }
+}
+
+static void _free_operation(Operation *op) {
+  for (int i = 0; i < op->n_ops; ++i) {
+    free(op->operands[i]);
+  }
+
+  free(op);
+}
+
+static void _free_directive(Directive *dir) {
+  if (dir->has_operand) {
+    free(dir->operand);
+  }
+
+  free(dir);
 }
 
 static void _print_labell(LabelList *labell) {
