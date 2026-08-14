@@ -357,7 +357,7 @@ static void _convert_label_operation(Line *line, LabelList *labell, int i) {
   Operation *op = line->line.operation;
   LabelMap *current = labell->head;
 
-  while (strncmp(op->operands[i]->operand.label, current->label, STRLEN)) {
+  while (current && strncmp(op->operands[i]->operand.label, current->label, STRLEN)) {
     current = current->next;
   }
 
@@ -379,7 +379,7 @@ static void _convert_label_directive(Line *line, LabelList *labell) {
 
   dir->operand->type = OPT_IMM16;
 
-  while (strncmp(dir->operand->operand.label, current->label, STRLEN)) {
+  while (current && strncmp(dir->operand->operand.label, current->label, STRLEN)) {
     current = current->next;
   }
 
