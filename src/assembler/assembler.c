@@ -36,7 +36,10 @@ void assemble(const char *fpath) {
     return;
   }
 
+  printf("\n");
   _print_labell(&labell);
+  printf("\n");
+  _print_linel(&linel);
   printf("\n");
 
   uint16_t instructions[words];

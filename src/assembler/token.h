@@ -20,6 +20,10 @@
 #define IMM_MAP                                                             \
   ((const int[]){OPERAND_INVALID, OPT_IMM16, OPT_PCOFFSET11, OPT_PCOFFSET9, \
                  OPT_TRAPVECT8, OPT_OFFSET6, OPT_IMM5})
+#define IMM_STRMAP                                                                  \
+  ((const char*[]){"OPERAND_INVALID", "OPT_IMM16", "OPT_PCOFFSET11", "OPT_PCOFFSET9", \
+                 "OPT_TRAPVECT8", "OPT_OFFSET6", "OPT_IMM5"})
+#define OPT_IMM_OFFSET (OPT_IMM5|OPT_OFFSET6|OPT_TRAPVECT8|OPT_PCOFFSET9|OPT_PCOFFSET11|OPT_IMM16)
 
 typedef struct LabelMap LabelMap;
 struct LabelMap {

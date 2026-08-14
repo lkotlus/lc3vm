@@ -180,9 +180,12 @@ static Operand *_parse_operand_imm(const char *token, int is_dec) {
 
   operand->type = OPERAND_INVALID;
 
-  for (int i = 0; imm <= MAX_INTS[i]; ++i) {
+  printf("%s: ", token); fflush(stdout);
+  for (int i = 0; imm <= MAX_INTS[i] && i <= N_MAX_INTS; ++i) {
+    printf("%s, ", IMM_STRMAP[i]); fflush(stdout);
     operand->type |= IMM_MAP[i];
   }
+  printf("\n");
 
   operand->operand.imm = (int16_t)imm;
 
