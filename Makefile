@@ -20,3 +20,6 @@ clean:
 
 format:
 	clang-format -i src/**/*.c src/**/*.h
+
+memleaks:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./lc3vm -a test.asm test.asm
