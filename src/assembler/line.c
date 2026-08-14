@@ -9,22 +9,6 @@
 #include "assembler/token.h"
 #include "constants.h"
 
-const char *line_errs[] = {
-    "LINE_ERR_NONE",
-    "LINE_ERR_INVALID_TOKEN",
-    "LINE_ERR_DUPLICATE_LABEL",
-    "LINE_ERR_NO_ORIG",
-    "LINE_ERR_OP",
-    "LINE_ERR_DIR",
-};
-const char *operation_errs[] = {"OP_ERR_NONE", "OP_ERR_TOO_MANY_OPERANDS",
-                                "OP_ERR_TOO_FEW_OPERANDS",
-                                "OP_ERR_WRONG_TYPE_OPERANDS"};
-const char *directive_errs[] = {"DIR_ERR_NONE", "DIR_ERR_TOO_MANY_OPERANDS",
-                                "DIR_ERR_TOO_FEW_OPERANDS",
-                                "DIR_ERR_WRONG_TYPE_OPERANDS"};
-const char *line_types[] = {"LINE_OPERATION", "LINE_DIRECTIVE"};
-
 // Gets the next line of a file that contains a token
 static Line *_line_factory();
 static int _get_fline(FILE *f, char *line);
@@ -351,11 +335,8 @@ static int _assemble_directive(Line *line, LabelList *labell, uint16_t inst[],
       }
       return dir->operand->operand.imm;
     case STRINGZ:
-      for (int j = 0;
-           j < (int)strlen(dir->operand->operand.stringz);
-           ++j) {
-        inst[i + j] =
-            (uint16_t)dir->operand->operand.stringz[j];
+      for (int j = 0; j < (int)strlen(dir->operand->operand.stringz); ++j) {
+        inst[i + j] = (uint16_t)dir->operand->operand.stringz[j];
       }
       return strlen(dir->operand->operand.stringz);
     case END:
@@ -385,7 +366,8 @@ static void _convert_label_operation(Line *line, LabelList *labell, int i) {
   } else {
     op->operands[i]->operand.imm = (int16_t)(current->addr - (line->addr + 1));
 
-    for (int j = 0; op->operands[i]->operand.imm <= MAX_INTS[i] && j <= N_MAX_INTS; ++j) {
+    for (int j = 0;
+         op->operands[i]->operand.imm <= MAX_INTS[i] && j <= N_MAX_INTS; ++j) {
       op->operands[i]->type |= IMM_MAP[j];
     }
   }

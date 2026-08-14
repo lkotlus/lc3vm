@@ -29,17 +29,16 @@ void assemble(const char *fpath) {
     printf("ENCOUNTERED ERRORS!\n");
     printf("\tLine error: %s\n", line_errs[linel.tail->err]);
     if (linel.tail->type == LINE_OPERATION) {
-      printf("\tOperation error: %s\n", operation_errs[linel.tail->line.operation->err]);
-    } else{
-      printf("\tDirective error: %s\n", directive_errs[linel.tail->line.directive->err]);
+      printf("\tOperation error: %s\n",
+             operation_errs[linel.tail->line.operation->err]);
+    } else {
+      printf("\tDirective error: %s\n",
+             directive_errs[linel.tail->line.directive->err]);
     }
     return;
   }
 
-  printf("\n");
   _print_labell(&labell);
-  printf("\n");
-  _print_linel(&linel);
   printf("\n");
 
   uint16_t instructions[words];
