@@ -6,6 +6,7 @@
 
 #include "constants.h"
 
+#define GMAX_INT16 0x10000
 #define MAX_INT16 0xFFFF
 #define MAX_INT11 0x7FF
 #define MAX_INT9 0x1FF
@@ -13,12 +14,12 @@
 #define MAX_INT6 0x3F
 #define MAX_INT5 0x1F
 #define N_MAX_INTS 6
-#define MAX_INTS                                                         \
-  ((const long int[]){MAX_INT5, MAX_INT6, MAX_INT8, MAX_INT9, MAX_INT11, \
-                      MAX_INT16, LONG_MAX})
-#define IMM_MAP                                                       \
-  ((const int[]){OPT_IMM5, OPT_OFFSET6, OPT_TRAPVECT8, OPT_PCOFFSET9, \
-                 OPT_PCOFFSET11, OPT_IMM16, OPERAND_INVALID})
+#define MAX_INTS                                                            \
+  ((const long int[]){GMAX_INT16, MAX_INT16, MAX_INT11, MAX_INT9, MAX_INT8, \
+                      MAX_INT6, MAX_INT5})
+#define IMM_MAP                                                             \
+  ((const int[]){OPERAND_INVALID, OPT_IMM16, OPT_PCOFFSET11, OPT_PCOFFSET9, \
+                 OPT_TRAPVECT8, OPT_OFFSET6, OPT_IMM5})
 
 typedef struct LabelMap LabelMap;
 struct LabelMap {

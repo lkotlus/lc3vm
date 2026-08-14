@@ -204,7 +204,6 @@ static int _get_token(char **fline, char *token) {
       }
 
       token[i] = '\0';
-      printf("%s\n", token);
       return 1;
     }
 
@@ -214,12 +213,10 @@ static int _get_token(char **fline, char *token) {
           toupper(*((*fline)++));  // Someone ought to lock me up for this.
     }
     token[i] = '\0';
-    printf("%s\n", token);
     return 1;
   }
 
   token[i] = '\0';
-  printf("%s\n", token);
   return 0;
 }
 
@@ -273,6 +270,8 @@ static Directive *_get_directive(char **fl, DirectiveTypeMap *dirtypemap) {
 
     // Some serious voodoo going on here.
     if (!(operand->type & dirtypemap->operand)) {
+      printf("%d\n", operand->type);
+      printf("%d\n", dirtypemap->operand);
       dir->err = DIR_ERR_WRONG_TYPE_OPERANDS;
       return dir;
     }

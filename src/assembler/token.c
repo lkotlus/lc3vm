@@ -178,15 +178,13 @@ static Operand *_parse_operand_imm(const char *token, int is_dec) {
     imm = strtol(token, NULL, 16);
   }
 
-  int i = 0;
-  for (i = 0; imm >= MAX_INTS[i]; ++i) {
+  operand->type = OPERAND_INVALID;
+
+  for (int i = 0; imm <= MAX_INTS[i]; ++i) {
     operand->type |= IMM_MAP[i];
   }
 
-  if (i > 6)
-    operand->type = OPERAND_INVALID;
-  else
-    operand->operand.imm = (int16_t)imm;
+  operand->operand.imm = (int16_t)imm;
 
   return operand;
 }

@@ -87,8 +87,6 @@ static int _first_pass(FILE *file, LabelList *labell, LineList *linel) {
           break;
       }
     }
-
-    print_line(line);
   }
 
   return words;
