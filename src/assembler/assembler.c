@@ -26,8 +26,13 @@ void assemble(const char *fpath) {
   int words = _first_pass(file, &labell, &linel);
 
   if (words < 0) {
-    // Do some things.
     printf("ENCOUNTERED ERRORS!\n");
+    printf("\tLine error: %s\n", line_errs[linel.tail->err]);
+    if (linel.tail->type == LINE_OPERATION) {
+      printf("\tOperation error: %s\n", operation_errs[linel.tail->line.operation->err]);
+    } else{
+      printf("\tDirective error: %s\n", directive_errs[linel.tail->line.directive->err]);
+    }
     return;
   }
 
@@ -47,7 +52,6 @@ void assemble(const char *fpath) {
 
 static int _first_pass(FILE *file, LabelList *labell, LineList *linel) {
   int words = 0;
-  printf("CALLED FIRST PASS\n");
 
   for (Line *line = parse_line(file, -1, labell); line;
        line = parse_line(file, (int)(line->addr + 1), labell)) {

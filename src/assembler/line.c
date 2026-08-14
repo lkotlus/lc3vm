@@ -81,13 +81,19 @@ Line *parse_line(FILE *f, int addr, LabelList *labell) {
     return line;
   }
 
+  if (line->err != LINE_ERR_NONE) {
+    return line;
+  }
+
   if (addr < 0) {
-    if (line->line.directive->type != ORIG)
+    if (line->line.directive->type != ORIG) {
       line->err = LINE_ERR_NO_ORIG;
-    else
+    } else {
       line->addr = line->line.directive->operand->operand.imm;
-  } else
+    }
+  } else {
     line->addr = (uint16_t)addr;
+  }
 
   return line;
 }
@@ -198,6 +204,7 @@ static int _get_token(char **fline, char *token) {
       }
 
       token[i] = '\0';
+      printf("%s\n", token);
       return 1;
     }
 
@@ -207,10 +214,12 @@ static int _get_token(char **fline, char *token) {
           toupper(*((*fline)++));  // Someone ought to lock me up for this.
     }
     token[i] = '\0';
+    printf("%s\n", token);
     return 1;
   }
 
   token[i] = '\0';
+  printf("%s\n", token);
   return 0;
 }
 
