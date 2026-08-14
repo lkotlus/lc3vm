@@ -285,7 +285,7 @@ static void _print_operation(Line *line) {
 
   for (int i = 0; i < line->line.operation->n_ops; ++i) {
     if (line->line.operation->operands[i]->type & OPT_IMM_OFFSET) {
-      printf("0x%x", line->line.operation->operands[i]->operand.imm);
+      printf("0x%04hx", (int16_t)line->line.operation->operands[i]->operand.imm);
     } else if (line->line.operation->operands[i]->type & OPT_REG) {
       printf("%s", reg_map[line->line.operation->operands[i]->operand.reg].token);
     } else if (line->line.operation->operands[i]->type & OPT_LAB) {
@@ -304,25 +304,12 @@ static void _print_directive(Line *line) {
   printf("%s ", directive_map[line->line.directive->type].token);
 
   if (line->line.directive->has_operand) {
-    switch (line->line.directive->operand->type) {
-      case OPT_IMM5:
-      case OPT_OFFSET6:
-      case OPT_TRAPVECT8:
-      case OPT_PCOFFSET9:
-      case OPT_PCOFFSET11:
-      case OPT_IMM16:
-        printf("0x%x", line->line.directive->operand->operand.imm);
-        break;
-      case OPT_REG:
-        break;
-      case OPT_LAB:
-        printf("%s", line->line.directive->operand->operand.label);
-        break;
-      case OPT_STRINGZ:
-        printf("\"%s\"", line->line.directive->operand->operand.stringz);
-        break;
-      case OPERAND_INVALID:
-        break;
+    if (line->line.directive->operand->type & OPT_IMM_OFFSET) {
+      printf("0x%04hx", (int16_t)line->line.directive->operand->operand.imm);
+    } else if (line->line.directive->operand->type & OPT_LAB) {
+      printf("%s", line->line.directive->operand->operand.label);
+    } else if (line->line.directive->operand->type & OPT_STRINGZ) {
+      printf("\"%s\"", line->line.directive->operand->operand.stringz);
     }
   }
 
@@ -396,8 +383,8 @@ static void _convert_label_operation(Line *line, LabelList *labell, int i) {
     line->line.operation->operands[i]->operand.imm =
         (int16_t)(current->addr - (line->addr + 1));
 
-    for (int i = 0; line->line.operation->operands[i]->operand.imm <= MAX_INTS[i] && i <= N_MAX_INTS; ++i) {
-      line->line.operation->operands[i]->type |= IMM_MAP[i];
+    for (int j = 0; line->line.operation->operands[i]->operand.imm <= MAX_INTS[i] && j <= N_MAX_INTS; ++j) {
+      line->line.operation->operands[i]->type |= IMM_MAP[j];
     }
   }
 }
