@@ -10,14 +10,15 @@ typedef enum {
   OP_ERR_NONE,
   OP_ERR_TOO_MANY_OPERANDS,
   OP_ERR_TOO_FEW_OPERANDS,
-  OP_ERR_WRONG_TYPE_OPERANDS
+  OP_ERR_WRONG_TYPE_OPERANDS,
+  OP_ERR_NOMATCH_LABEL
 } OperationErr;
 extern const char *operation_errs[];
 
 typedef struct {
   OperationErr err;
   int n_ops;
-  Operand operands[3];
+  Operand *operands[3];
   OperationCode opcode;
 } Operation;
 
@@ -34,7 +35,7 @@ typedef struct {
   DirectiveErr err;
   DirectiveType type;
   int has_operand;
-  Operand operand;
+  Operand *operand;
 } Directive;
 
 // Lines
@@ -58,8 +59,8 @@ struct Line {
   char label[STRLEN];
   LineType type;
   union {
-    Directive directive;
-    Operation operation;
+    Directive *directive;
+    Operation *operation;
   } line;
   Line *next;
 };

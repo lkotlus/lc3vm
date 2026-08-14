@@ -2,8 +2,39 @@
 #define TOKEN
 
 #include <stdint.h>
+#include <limits.h>
 
 #include "constants.h"
+
+#define MAX_INT16 0xFFFF
+#define MAX_INT11 0x7FF
+#define MAX_INT9 0x1FF
+#define MAX_INT8 0xFF
+#define MAX_INT6 0x3F
+#define MAX_INT5 0x1F
+#define N_MAX_INTS 6
+#define MAX_INTS (        \
+    (const long int[]){        \
+        MAX_INT5,         \
+        MAX_INT6,         \
+        MAX_INT8,         \
+        MAX_INT9,         \
+        MAX_INT11,        \
+        MAX_INT16,        \
+        LONG_MAX          \
+    }                     \
+)
+#define IMM_MAP (         \
+    (const int[]){        \
+        OPT_IMM5,         \
+        OPT_OFFSET6,      \
+        OPT_TRAPVECT8,    \
+        OPT_PCOFFSET9,    \
+        OPT_PCOFFSET11,   \
+        OPT_IMM16,        \
+        OPERAND_INVALID   \
+    }                     \
+)
 
 typedef struct LabelMap LabelMap;
 struct LabelMap {
@@ -27,10 +58,15 @@ LabelResult parse_label(const char *token, LabelList *labell);
 
 // Operands
 typedef enum {
-  OPT_STR = 1 << 0,
-  OPT_LAB = 1 << 1,
-  OPT_IVA = 1 << 2,
-  OPT_REG = 1 << 3,
+  OPT_LAB         = 1 << 0,
+  OPT_REG         = 1 << 1,
+  OPT_IMM5        = 1 << 2,
+  OPT_PCOFFSET9   = 1 << 3,
+  OPT_PCOFFSET11  = 1 << 4,
+  OPT_OFFSET6     = 1 << 5,
+  OPT_TRAPVECT8   = 1 << 6,
+  OPT_STRINGZ     = 1 << 7,
+  OPT_IMM16       = 1 << 8,
   OPERAND_INVALID = 0
 } OperandType;
 
@@ -39,7 +75,7 @@ typedef enum { R0, R1, R2, R3, R4, R5, R6, R7 } Register;
 typedef struct {
   OperandType type;
   union {
-    int16_t ival;
+    int16_t imm;
     Register reg;
     char label[STRLEN];
     char stringz[STRLEN];
@@ -91,7 +127,6 @@ typedef enum {
 
 typedef struct {
   int n_ops;
-  int ival_signed;
   OperandType op_types[3];
 } OperationSpec;
 
@@ -102,35 +137,35 @@ typedef struct {
 } OperationCodeMap;
 
 static const OperationCodeMap opcode_map[] = {
-    {"ADD", ADD, {3, 1, {OPT_REG, OPT_REG, OPT_REG | OPT_IVA}}},
-    {"AND", AND, {3, 1, {OPT_REG, OPT_REG, OPT_REG | OPT_IVA}}},
-    {"NOT", NOT, {2, 0, {OPT_REG, OPT_REG, 0}}},
-    {"LD", LD, {2, 1, {OPT_REG, OPT_LAB, 0}}},
-    {"LDI", LDI, {2, 1, {OPT_REG, OPT_LAB, 0}}},
-    {"LDR", LDR, {3, 1, {OPT_REG, OPT_REG, OPT_IVA}}},
-    {"LEA", LEA, {2, 1, {OPT_REG, OPT_LAB, 0}}},
-    {"ST", ST, {2, 1, {OPT_REG, OPT_LAB, 0}}},
-    {"STR", STR, {3, 1, {OPT_REG, OPT_REG, OPT_IVA}}},
-    {"STI", STI, {2, 1, {OPT_REG, OPT_LAB, 0}}},
-    {"BR", BR, {1, 1, {OPT_IVA | OPT_LAB, 0, 0}}},
-    {"BRN", BRN, {1, 1, {OPT_IVA | OPT_LAB, 0, 0}}},
-    {"BRZ", BRZ, {1, 1, {OPT_IVA | OPT_LAB, 0, 0}}},
-    {"BRP", BRP, {1, 1, {OPT_IVA | OPT_LAB, 0, 0}}},
-    {"BRNZ", BRNZ, {1, 1, {OPT_IVA | OPT_LAB, 0, 0}}},
-    {"BRZP", BRZP, {1, 1, {OPT_IVA | OPT_LAB, 0, 0}}},
-    {"BRNP", BRNP, {1, 1, {OPT_IVA | OPT_LAB, 0, 0}}},
-    {"JSR", JSR, {1, 1, {OPT_IVA | OPT_LAB, 0, 0}}},
-    {"JSRR", JSRR, {1, 0, {OPT_REG, 0, 0}}},
-    {"JMP", JMP, {1, 0, {OPT_REG, 0, 0}}},
-    {"RTI", RTI, {0, 0, {0, 0, 0}}},
-    {"TRAP", TRAP, {1, 0, {OPT_IVA, 0, 0}}},
-    {"GETC", GETC, {0, 0, {0, 0, 0}}},
-    {"OUT", OUT, {0, 0, {0, 0, 0}}},
-    {"PUTS", PUTS, {0, 0, {0, 0, 0}}},
-    {"IN", IN, {0, 0, {0, 0, 0}}},
-    {"PUTSP", PUTSP, {0, 0, {0, 0, 0}}},
-    {"HALT", HALT, {0, 0, {0, 0, 0}}},
-    {"", OPCODE_INVALID, {0, 0, {0, 0, 0}}}};
+    {"ADD", ADD, {3, {OPT_REG, OPT_REG, OPT_REG | OPT_IMM5}}},
+    {"AND", AND, {3, {OPT_REG, OPT_REG, OPT_REG | OPT_IMM5}}},
+    {"NOT", NOT, {2, {OPT_REG, OPT_REG, 0}}},
+    {"LD", LD, {2, {OPT_REG, OPT_LAB | OPT_PCOFFSET9, 0}}},
+    {"LDI", LDI, {2, {OPT_REG, OPT_LAB | OPT_PCOFFSET9, 0}}},
+    {"LDR", LDR, {3, {OPT_REG, OPT_REG, OPT_OFFSET6}}},
+    {"LEA", LEA, {2, {OPT_REG, OPT_LAB | OPT_PCOFFSET9, 0}}},
+    {"ST", ST, {2, {OPT_REG, OPT_LAB | OPT_PCOFFSET9, 0}}},
+    {"STR", STR, {3, {OPT_REG, OPT_REG, OPT_OFFSET6}}},
+    {"STI", STI, {2, {OPT_REG, OPT_LAB | OPT_PCOFFSET9, 0}}},
+    {"BR", BR, {1, {OPT_LAB | OPT_PCOFFSET9, 0, 0}}},
+    {"BRN", BRN, {1, {OPT_LAB | OPT_PCOFFSET9, 0, 0}}},
+    {"BRZ", BRZ, {1, {OPT_LAB | OPT_PCOFFSET9, 0, 0}}},
+    {"BRP", BRP, {1, {OPT_LAB | OPT_PCOFFSET9, 0, 0}}},
+    {"BRNZ", BRNZ, {1, {OPT_LAB | OPT_PCOFFSET9, 0, 0}}},
+    {"BRZP", BRZP, {1, {OPT_LAB | OPT_PCOFFSET9, 0, 0}}},
+    {"BRNP", BRNP, {1, {OPT_LAB | OPT_PCOFFSET9, 0, 0}}},
+    {"JSR", JSR, {1, {OPT_LAB | OPT_PCOFFSET11, 0, 0}}},
+    {"JSRR", JSRR, {1, {OPT_REG, 0, 0}}},
+    {"JMP", JMP, {1, {OPT_REG, 0, 0}}},
+    {"RTI", RTI, {0, {0, 0, 0}}},
+    {"TRAP", TRAP, {1, {OPT_TRAPVECT8, 0, 0}}},
+    {"GETC", GETC, {0, {0, 0, 0}}},
+    {"OUT", OUT, {0, {0, 0, 0}}},
+    {"PUTS", PUTS, {0, {0, 0, 0}}},
+    {"IN", IN, {0, {0, 0, 0}}},
+    {"PUTSP", PUTSP, {0, {0, 0, 0}}},
+    {"HALT", HALT, {0, {0, 0, 0}}},
+    {"", OPCODE_INVALID, {0, {0, 0, 0}}}};
 
 OperationCodeMap *parse_opcode(const char *token);
 
@@ -151,11 +186,11 @@ typedef struct {
 } DirectiveTypeMap;
 
 static const DirectiveTypeMap directive_map[] = {
-    {".ORIG", ORIG, OPT_IVA},
+    {".ORIG", ORIG, OPT_IMM16},
     {".END", END, OPERAND_INVALID},
-    {".FILL", FILL, OPT_IVA | OPT_LAB},
-    {".BLKW", BLKW, OPT_IVA},
-    {".STRINGZ", STRINGZ, OPT_STR},
+    {".FILL", FILL, OPT_LAB | OPT_IMM16},
+    {".BLKW", BLKW, OPT_IMM16},
+    {".STRINGZ", STRINGZ, OPT_STRINGZ},
     {"", DIRECTIVE_INVALID, OPERAND_INVALID}};
 
 DirectiveTypeMap *parse_dirtype(const char *token);

@@ -13,7 +13,7 @@ static int _is_hex(const char *token);
 static int _is_register(const char *token, Register *reg);
 static int _is_opcode(const char *token, OperationCodeMap *opcodemap);
 static int _is_directive(const char *token, DirectiveTypeMap *dirtypemap);
-static Operand *_parse_operand_ival(const char *token, int is_dec);
+static Operand *_parse_operand_imm(const char *token, int is_dec);
 static Operand *_parse_operand_reg(Register reg);
 static Operand *_parse_operand_label(const char *token);
 static Operand *_parse_operand_stringz(const char *token);
@@ -34,9 +34,9 @@ LabelResult parse_label(const char *token, LabelList *labell) {
 
 Operand *parse_operand(const char *token) {
   if (_is_dec(token)) {
-    return _parse_operand_ival(token, 1);
+    return _parse_operand_imm(token, 1);
   } else if (_is_hex(token)) {
-    return _parse_operand_ival(token, 0);
+    return _parse_operand_imm(token, 0);
   } else if (token[0] == '"') {
     return _parse_operand_stringz(token);
   }
@@ -167,16 +167,24 @@ static int _is_directive(const char *token, DirectiveTypeMap *dirtypemap) {
   return 0;
 }
 
-static Operand *_parse_operand_ival(const char *token, int is_dec) {
+static Operand *_parse_operand_imm(const char *token, int is_dec) {
   Operand *operand = (Operand *)malloc(sizeof(Operand));
-  operand->type = OPT_IVA;
+  long int imm;
 
   if (is_dec) {
-    operand->operand.ival = (int16_t)strtol(++token, NULL, 10);
+    imm = strtol(++token, NULL, 10);
   } else {
     token += token[0] == 'X' ? 1 : 2;
-    operand->operand.ival = (int16_t)strtol(token, NULL, 16);
+    imm = strtol(token, NULL, 16);
   }
+
+  int i = 0;
+  for (i = 0; imm >= MAX_INTS[i]; ++i) {
+    operand->type |= IMM_MAP[i];
+  }
+
+  if (i > 6) operand->type = OPERAND_INVALID;
+  else operand->operand.imm = (int16_t)imm;
 
   return operand;
 }
@@ -209,7 +217,7 @@ static Operand *_parse_operand_label(const char *token) {
 static Operand *_parse_operand_stringz(const char *token) {
   Operand *operand = (Operand *)malloc(sizeof(Operand));
 
-  operand->type = OPT_STR;
+  operand->type = OPT_STRINGZ;
   strncpy(operand->operand.stringz, ++token, STRLEN);
   operand->operand.stringz[STRLEN-1] = '\0';
 

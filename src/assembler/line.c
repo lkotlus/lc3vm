@@ -36,7 +36,9 @@ static void _print_operation(Line *line);
 static void _print_directive(Line *line);
 static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[], int i);
 static int _assemble_directive(Line *line, LabelList *labell, uint16_t inst[], int i);
-static void _convert_label(Operand *label_operand, LabelList* labell);
+static void _convert_label(Line *label_operand, LabelList* labell, int i);
+static void _convert_label_operation(Line *line, LabelList *labell, int i);
+static void _convert_label_directive(Line *line, LabelList *labell);
 
 Line *parse_line(FILE *f, int addr, LabelList *labell) {
   Line *line = _line_factory();
@@ -63,13 +65,13 @@ Line *parse_line(FILE *f, int addr, LabelList *labell) {
   if (opcodemap->opcode != OPCODE_INVALID) {
     Operation *op = _get_operation(&fl, opcodemap);
     line->type = LINE_OPERATION;
-    line->line.operation = *op;
+    line->line.operation = op;
 
     if (op->err != OP_ERR_NONE) line->err = LINE_ERR_OP;
   } else if (dirtypemap->dirtype != DIRECTIVE_INVALID) {
     Directive *dir = _get_directive(&fl, dirtypemap);
     line->type = LINE_DIRECTIVE;
-    line->line.directive = *dir;
+    line->line.directive = dir;
 
     if (dir->err != DIR_ERR_NONE) line->err = LINE_ERR_DIR;
   } else {
@@ -78,10 +80,10 @@ Line *parse_line(FILE *f, int addr, LabelList *labell) {
   }
 
   if (addr < 0) {
-    if (line->line.directive.type != ORIG)
+    if (line->line.directive->type != ORIG)
       line->err = LINE_ERR_NO_ORIG;
     else
-      line->addr = line->line.directive.operand.operand.ival;
+      line->addr = line->line.directive->operand->operand.imm;
   } else
     line->addr = (uint16_t)addr;
 
@@ -221,7 +223,7 @@ static Operation *_get_operation(char **fl, OperationCodeMap *opcodemap) {
       return op;
     }
 
-    op->operands[i] = *operand;
+    op->operands[i] = operand;
   }
 
   if (_get_token(fl, token)) op->err = OP_ERR_TOO_MANY_OPERANDS;
@@ -252,34 +254,39 @@ static Directive *_get_directive(char **fl, DirectiveTypeMap *dirtypemap) {
       return dir;
     }
 
-    dir->operand = *operand;
+    dir->operand = operand;
   }
 
   return dir;
 }
 
 static void _print_operation(Line *line) {
-  printf("%s ", opcode_map[line->line.operation.opcode].token);
+  printf("%s ", opcode_map[line->line.operation->opcode].token);
 
-  for (int i = 0; i < line->line.operation.n_ops; ++i) {
-    switch (line->line.operation.operands[i].type) {
-      case OPT_IVA:
-        printf("0x%x", line->line.operation.operands[i].operand.ival);
+  for (int i = 0; i < line->line.operation->n_ops; ++i) {
+    switch (line->line.operation->operands[i]->type) {
+      case OPT_IMM5:
+      case OPT_OFFSET6:
+      case OPT_TRAPVECT8:
+      case OPT_PCOFFSET9:
+      case OPT_PCOFFSET11:
+      case OPT_IMM16:
+        printf("0x%x", line->line.operation->operands[i]->operand.imm);
         break;
       case OPT_REG:
         printf("%s",
-               reg_map[line->line.operation.operands[i].operand.reg].token);
+               reg_map[line->line.operation->operands[i]->operand.reg].token);
         break;
       case OPT_LAB:
-        printf("%s", line->line.operation.operands[i].operand.label);
+        printf("%s", line->line.operation->operands[i]->operand.label);
         break;
-      case OPT_STR:
+      case OPT_STRINGZ:
         break;
       case OPERAND_INVALID:
         break;
     }
 
-    if (i < line->line.operation.n_ops - 1) {
+    if (i < line->line.operation->n_ops - 1) {
       printf(", ");
     }
   }
@@ -288,20 +295,25 @@ static void _print_operation(Line *line) {
 }
 
 static void _print_directive(Line *line) {
-  printf("%s ", directive_map[line->line.directive.type].token);
+  printf("%s ", directive_map[line->line.directive->type].token);
 
-  if (line->line.directive.has_operand) {
-    switch (line->line.directive.operand.type) {
-      case OPT_IVA:
-        printf("0x%x", line->line.directive.operand.operand.ival);
+  if (line->line.directive->has_operand) {
+    switch (line->line.directive->operand->type) {
+      case OPT_IMM5:
+      case OPT_OFFSET6:
+      case OPT_TRAPVECT8:
+      case OPT_PCOFFSET9:
+      case OPT_PCOFFSET11:
+      case OPT_IMM16:
+        printf("0x%x", line->line.directive->operand->operand.imm);
         break;
       case OPT_REG:
         break;
       case OPT_LAB:
-        printf("%s", line->line.directive.operand.operand.label);
+        printf("%s", line->line.directive->operand->operand.label);
         break;
-      case OPT_STR:
-        printf("\"%s\"", line->line.directive.operand.operand.stringz);
+      case OPT_STRINGZ:
+        printf("\"%s\"", line->line.directive->operand->operand.stringz);
         break;
       case OPERAND_INVALID:
         break;
@@ -312,10 +324,9 @@ static void _print_directive(Line *line) {
 }
 
 static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[], int i) {
-  for (int i = 0; i < line->line.operation.n_ops; ++i) {
-    if (line->line.operation.operands[i].type == OPT_LAB) {
-      line->line.operation.operands[i].type = OPT_IVA;
-      _convert_label(&line->line.operation.operands[i], labell);
+  for (int i = 0; i < line->line.operation->n_ops; ++i) {
+    if (line->line.operation->operands[i]->type == OPT_LAB) {
+      _convert_label(line, labell, i);
     }
   }
 
@@ -324,38 +335,70 @@ static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[], i
 }
 
 static int _assemble_directive(Line *line, LabelList *labell, uint16_t inst[], int i) {
-  if (line->line.directive.has_operand && line->line.directive.operand.type == OPT_LAB) {
-    _convert_label(&line->line.directive.operand, labell);
+  if (line->line.directive->has_operand && line->line.directive->operand->type == OPT_LAB) {
+    _convert_label(line, labell, i);
   }
 
-  switch (line->line.directive.type) {
+  switch (line->line.directive->type) {
     case ORIG:
-      inst[i] = line->line.directive.operand.operand.ival;
+      inst[i] = line->line.directive->operand->operand.imm;
       return 1;
     case FILL:
-      inst[i] = line->line.directive.operand.operand.ival;
+      inst[i] = line->line.directive->operand->operand.imm;
       return 1;
     case BLKW:
-      for (int j = 0; j < line->line.directive.operand.operand.ival; ++j) {
+      for (int j = 0; j < line->line.directive->operand->operand.imm; ++j) {
         inst[i+j] = 0x0000;
       }
-      return line->line.directive.operand.operand.ival;
+      return line->line.directive->operand->operand.imm;
     case STRINGZ:
-      for (int j = 0; j < (int)strlen(line->line.directive.operand.operand.stringz); ++j) {
-        inst[i+j] = (uint16_t)line->line.directive.operand.operand.stringz[j];
+      for (int j = 0; j < (int)strlen(line->line.directive->operand->operand.stringz); ++j) {
+        inst[i+j] = (uint16_t)line->line.directive->operand->operand.stringz[j];
       }
-      return strlen(line->line.directive.operand.operand.stringz);
+      return strlen(line->line.directive->operand->operand.stringz);
     case END: return 0;
     case DIRECTIVE_INVALID: return 0;
   }
 }
 
-static void _convert_label(Operand *operand, LabelList* labell) {
+static void _convert_label(Line *line, LabelList* labell, int i) {
+  if (line->type == LINE_OPERATION) _convert_label_operation(line, labell, i);
+  else _convert_label_directive(line, labell);
+}
+
+static void _convert_label_operation(Line *line, LabelList *labell, int i) {
   LabelMap *current = labell->head;
 
-  while (strncmp(operand->operand.label, current->label, STRLEN)) {
+  while (strncmp(line->line.operation->operands[i]->operand.label, current->label, STRLEN)) {
     current = current->next;
   }
 
-  operand->operand.ival = current->addr;
+  if (!current) {
+    line->line.operation->err = OP_ERR_NOMATCH_LABEL;
+  } else {
+    line->line.operation->operands[i]->operand.imm = 
+        (int16_t)(current->addr - (line->addr + 1));
+
+    int i = 0;
+    for (i = 0; line->line.operation->operands[i]->operand.imm >= MAX_INTS[i]; ++i) {
+      line->line.operation->operands[i]->type = IMM_MAP[i];
+    }
+
+    if (i > 6) line->line.operation->operands[i]->type = OPERAND_INVALID;
+  }
+}
+
+static void _convert_label_directive(Line *line, LabelList *labell) {
+  LabelMap *current = labell->head;
+  line->line.directive->operand->type = OPT_IMM16;
+
+  while (strncmp(line->line.directive->operand->operand.label, current->label, STRLEN)) {
+    current = current->next;
+  }
+
+  if (!current) {
+    line->line.operation->err = OP_ERR_NOMATCH_LABEL;
+  } else {
+    line->line.directive->operand->operand.imm = current->addr;
+  }
 }

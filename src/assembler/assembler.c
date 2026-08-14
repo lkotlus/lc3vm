@@ -63,7 +63,7 @@ static int _first_pass(FILE *file, LabelList *labell, LineList *linel) {
     if (line->type == LINE_OPERATION) {
       ++words;
     } else {
-      switch (line->line.directive.type) {
+      switch (line->line.directive->type) {
         case ORIG:
           ++words;
           break;
@@ -71,10 +71,10 @@ static int _first_pass(FILE *file, LabelList *labell, LineList *linel) {
           ++words;
           break;
         case BLKW:
-          words += line->line.directive.operand.operand.ival;
+          words += line->line.directive->operand->operand.imm;
           break;
         case STRINGZ:
-          words += strlen(line->line.directive.operand.operand.stringz);
+          words += strlen(line->line.directive->operand->operand.stringz);
           break;
         case END: return words;
         case DIRECTIVE_INVALID: break;
