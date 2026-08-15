@@ -369,11 +369,15 @@ static void _convert_label_operation(Line *line, LabelList *labell, int i) {
     op->operands[i]->operand.imm = (int16_t)(current->addr - (line->addr + 1));
 
     for (int j = 0;
-         op->operands[i]->operand.imm <= OFF_BOUNDS[i] && j <= N_OFF_BOUNDS; ++j) {
+         op->operands[i]->operand.imm <= OFF_BOUNDS[i] && j <= N_OFF_BOUNDS;
+         ++j) {
       op->operands[i]->type |= OFF_MAP[j];
     }
 
-    for (int j = 0; op->operands[i]->operand.imm <= OFF_BOUNDS[j] - 1 && op->operands[i]->operand.imm >= OFF_BOUNDS[j]*(-1) && j <= N_OFF_BOUNDS; ++j) {
+    for (int j = 0; op->operands[i]->operand.imm <= OFF_BOUNDS[j] - 1 &&
+                    op->operands[i]->operand.imm >= OFF_BOUNDS[j] * (-1) &&
+                    j <= N_OFF_BOUNDS;
+         ++j) {
       op->operands[i]->type |= OFF_MAP[j];
     }
   }

@@ -14,9 +14,9 @@
 #define BOUND_INT6 32
 #define BOUND_INT5 16
 #define N_OFF_BOUNDS 6
-#define OFF_BOUNDS                                                          \
-  ((const long int[]){GBOUND_INT16, BOUND_INT16, BOUND_INT11, BOUND_INT9, BOUND_INT8, \
-                      BOUND_INT6, BOUND_INT5})
+#define OFF_BOUNDS                                                        \
+  ((const long int[]){GBOUND_INT16, BOUND_INT16, BOUND_INT11, BOUND_INT9, \
+                      BOUND_INT8, BOUND_INT6, BOUND_INT5})
 #define OFF_MAP                                                             \
   ((const int[]){OPERAND_INVALID, OPT_IMM16, OPT_PCOFFSET11, OPT_PCOFFSET9, \
                  OPT_TRAPVECT8, OPT_OFFSET6, OPT_IMM5})
@@ -24,7 +24,7 @@
   ((const char *[]){"OPERAND_INVALID", "OPT_IMM16", "OPT_PCOFFSET11", \
                     "OPT_PCOFFSET9", "OPT_TRAPVECT8", "OPT_OFFSET6",  \
                     "OPT_IMM5"})
-#define OPT_IMM_OFFSET                                                       \
+#define OPT_IMM_OFFSET \
   (OPT_OFFSET6 | OPT_TRAPVECT8 | OPT_PCOFFSET9 | OPT_PCOFFSET11 | OPT_IMM16)
 #define OPT_REG (OPT_REG1 | OPT_REG2 | OPT_REG3)
 
