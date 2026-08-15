@@ -6,28 +6,26 @@
 
 #include "constants.h"
 
-#define GMAX_INT16 0x10000
-#define MAX_INT16 0xFFFF
-#define MAX_INT11 0x7FF
-#define MAX_INT9 0x1FF
-#define MAX_INT8 0xFF
-#define MAX_INT6 0x3F
-#define MAX_INT5 15
-#define MIN_INT5 -16
-#define N_OFF_BOUNDS 5
+#define GBOUND_INT16 32769
+#define BOUND_INT16 32768
+#define BOUND_INT11 1024
+#define BOUND_INT9 256
+#define BOUND_INT8 128
+#define BOUND_INT6 32
+#define BOUND_INT5 16
+#define N_OFF_BOUNDS 6
 #define OFF_BOUNDS                                                          \
-  ((const long int[]){GMAX_INT16, MAX_INT16, MAX_INT11, MAX_INT9, MAX_INT8, \
-                      MAX_INT6})
+  ((const long int[]){GBOUND_INT16, BOUND_INT16, BOUND_INT11, BOUND_INT9, BOUND_INT8, \
+                      BOUND_INT6, BOUND_INT5})
 #define OFF_MAP                                                             \
   ((const int[]){OPERAND_INVALID, OPT_IMM16, OPT_PCOFFSET11, OPT_PCOFFSET9, \
                  OPT_TRAPVECT8, OPT_OFFSET6, OPT_IMM5})
-#define IMM_STRMAP                                                    \
+#define OFF_STRMAP                                                    \
   ((const char *[]){"OPERAND_INVALID", "OPT_IMM16", "OPT_PCOFFSET11", \
                     "OPT_PCOFFSET9", "OPT_TRAPVECT8", "OPT_OFFSET6",  \
                     "OPT_IMM5"})
 #define OPT_IMM_OFFSET                                                       \
-  (OPT_IMM5 | OPT_OFFSET6 | OPT_TRAPVECT8 | OPT_PCOFFSET9 | OPT_PCOFFSET11 | \
-   OPT_IMM16)
+  (OPT_OFFSET6 | OPT_TRAPVECT8 | OPT_PCOFFSET9 | OPT_PCOFFSET11 | OPT_IMM16)
 #define OPT_REG (OPT_REG1 | OPT_REG2 | OPT_REG3)
 
 typedef struct LabelMap LabelMap;

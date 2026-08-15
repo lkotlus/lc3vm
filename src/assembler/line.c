@@ -268,7 +268,8 @@ static void _print_operation(Operation *op) {
 
   for (int i = 0; i < op->n_ops; ++i) {
     if (op->operands[i]->type & OPT_IMM_OFFSET) {
-      printf("0x%04hx", (int16_t)op->operands[i]->operand.imm);
+      int16_t imm = (int16_t)op->operands[i]->operand.imm;
+      printf("0x%04hx (%d)", imm, imm);
     } else if (op->operands[i]->type & OPT_REG) {
       printf("%s", reg_map[op->operands[i]->operand.reg].token);
     } else if (op->operands[i]->type & OPT_LAB) {
@@ -288,7 +289,8 @@ static void _print_directive(Directive *dir) {
 
   if (dir->has_operand) {
     if (dir->operand->type & OPT_IMM_OFFSET) {
-      printf("0x%04hx", (int16_t)dir->operand->operand.imm);
+      int16_t imm = (int16_t)dir->operand->operand.imm;
+      printf("0x%04hx (%d)", imm, imm);
     } else if (dir->operand->type & OPT_LAB) {
       printf("%s", dir->operand->operand.label);
     } else if (dir->operand->type & OPT_STRINGZ) {
@@ -368,6 +370,10 @@ static void _convert_label_operation(Line *line, LabelList *labell, int i) {
 
     for (int j = 0;
          op->operands[i]->operand.imm <= OFF_BOUNDS[i] && j <= N_OFF_BOUNDS; ++j) {
+      op->operands[i]->type |= OFF_MAP[j];
+    }
+
+    for (int j = 0; op->operands[i]->operand.imm <= OFF_BOUNDS[j] - 1 && op->operands[i]->operand.imm >= OFF_BOUNDS[j]*(-1) && j <= N_OFF_BOUNDS; ++j) {
       op->operands[i]->type |= OFF_MAP[j];
     }
   }

@@ -180,12 +180,8 @@ static Operand *_parse_operand_imm(const char *token, int is_dec) {
 
   operand->type = OPERAND_INVALID;
 
-  for (int i = 0; imm <= OFF_BOUNDS[i] && i <= N_OFF_BOUNDS; ++i) {
+  for (int i = 0; imm <= OFF_BOUNDS[i] - 1 && imm >= OFF_BOUNDS[i]*(-1) && i <= N_OFF_BOUNDS; ++i) {
     operand->type |= OFF_MAP[i];
-  }
-
-  if (imm >= MIN_INT5 && imm <= MAX_INT5) {
-    operand->type |= OPT_IMM5;
   }
 
   operand->operand.imm = (int16_t)imm;
