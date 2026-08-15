@@ -39,6 +39,11 @@ void assemble(const char *fpath) {
              directive_errs[linel.tail->line.directive->err]);
     }
 
+    printf("\nProcessed up to:\n");
+    _print_linel(&linel);
+
+    printf("\nError occurred on the bottom line.\n");
+
     _free_labell(&labell);
     _free_linel(&linel);
     fclose(file);

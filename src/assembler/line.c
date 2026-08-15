@@ -215,22 +215,18 @@ static Operation *_get_operation(char **fl, OperationCodeMap *opcodemap) {
   op->n_ops = opcodemap->opspec.n_ops;
 
   for (int i = 0; i < opcodemap->opspec.n_ops; ++i) {
-    Operand *operand;
-
     if (!_get_token(fl, token)) {
       op->err = OP_ERR_TOO_FEW_OPERANDS;
       return op;
     }
 
-    operand = parse_operand(token);
+    op->operands[i] = parse_operand(token);
 
     // Some serious voodoo going on here.
-    if (!(operand->type & opcodemap->opspec.op_types[i])) {
+    if (!(op->operands[i]->type & opcodemap->opspec.op_types[i])) {
       op->err = OP_ERR_WRONG_TYPE_OPERANDS;
       return op;
     }
-
-    op->operands[i] = operand;
   }
 
   if (_get_token(fl, token)) op->err = OP_ERR_TOO_MANY_OPERANDS;
@@ -371,8 +367,8 @@ static void _convert_label_operation(Line *line, LabelList *labell, int i) {
     op->operands[i]->operand.imm = (int16_t)(current->addr - (line->addr + 1));
 
     for (int j = 0;
-         op->operands[i]->operand.imm <= IMM_BOUNDS[i] && j <= N_IMM_BOUNDS; ++j) {
-      op->operands[i]->type |= IMM_MAP[j];
+         op->operands[i]->operand.imm <= OFF_BOUNDS[i] && j <= N_OFF_BOUNDS; ++j) {
+      op->operands[i]->type |= OFF_MAP[j];
     }
   }
 }
