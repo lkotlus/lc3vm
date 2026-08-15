@@ -51,16 +51,16 @@ void assemble(const char *fpath) {
     return;
   }
 
-  _print_labell(&labell);
-  printf("\n");
-
-  uint16_t instructions[words];
+  uint16_t *instructions = (uint16_t *)malloc(sizeof(uint16_t) * words);
   _second_pass(&linel, &labell, instructions);
 
+  _print_labell(&labell);
+  printf("\n");
   _print_linel(&linel);
 
   _free_labell(&labell);
   _free_linel(&linel);
+  free(instructions);
 
   fclose(file);
 }
@@ -113,7 +113,7 @@ static int _second_pass(LineList *linel, LabelList *labell, uint16_t inst[]) {
   int i = 0;
 
   while (current) {
-    write_instructions(current, labell, inst, i++);
+    i += write_instructions(current, labell, inst, i);
     current = current->next;
   }
 
