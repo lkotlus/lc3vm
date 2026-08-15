@@ -371,7 +371,7 @@ static void _convert_label_operation(Line *line, LabelList *labell, int i) {
     op->operands[i]->operand.imm = (int16_t)(current->addr - (line->addr + 1));
 
     for (int j = 0;
-         op->operands[i]->operand.imm <= MAX_INTS[i] && j <= N_MAX_INTS; ++j) {
+         op->operands[i]->operand.imm <= IMM_BOUNDS[i] && j <= N_IMM_BOUNDS; ++j) {
       op->operands[i]->type |= IMM_MAP[j];
     }
   }

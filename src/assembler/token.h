@@ -12,11 +12,11 @@
 #define MAX_INT9 0x1FF
 #define MAX_INT8 0xFF
 #define MAX_INT6 0x3F
-#define MAX_INT5 0x1F
-#define N_MAX_INTS 6
-#define MAX_INTS                                                            \
+#define MIN_INT5 -16
+#define N_IMM_BOUNDS 6
+#define IMM_BOUNDS                                                          \
   ((const long int[]){GMAX_INT16, MAX_INT16, MAX_INT11, MAX_INT9, MAX_INT8, \
-                      MAX_INT6, MAX_INT5})
+                      MAX_INT6, MIN_INT5})
 #define IMM_MAP                                                             \
   ((const int[]){OPERAND_INVALID, OPT_IMM16, OPT_PCOFFSET11, OPT_PCOFFSET9, \
                  OPT_TRAPVECT8, OPT_OFFSET6, OPT_IMM5})
