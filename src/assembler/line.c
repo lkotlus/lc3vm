@@ -307,7 +307,7 @@ static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[],
   inst[n_inst] = opcode_map[op->opcode].machine_code;
   OperandType t;
 
-  printf("%s: ", opcode_map[op->opcode].token);
+  //printf("%s: ", opcode_map[op->opcode].token);
 
   for (int i = 0; i < op->n_ops; ++i) {
     t = opcode_map[op->opcode].opspec.op_types[i];
@@ -320,35 +320,35 @@ static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[],
     } 
 
     if (t & OPT_REG1) {
-      printf("Reg 1, ");
+      //printf("Reg 1, ");
       inject_reg1(&(inst[n_inst]), op->operands[i]->operand.imm);
     } else if (t & OPT_REG2) {
-      printf("Reg 2, ");
+      //printf("Reg 2, ");
       inject_reg2(&(inst[n_inst]), op->operands[i]->operand.imm);
     } else if (op->operands[i]->type & t & OPT_REG3) {
-      printf("Reg 3, ");
+      //printf("Reg 3, ");
       inject_reg3(&(inst[n_inst]), op->operands[i]->operand.imm);
     } else if (t & OPT_IMM5) {
-      printf("Imm5, ");
+      //printf("Imm5, ");
       inject_imm5(&(inst[n_inst]), op->operands[i]->operand.imm);
     } else if (t & OPT_OFFSET6) {
-      printf("Offset6, ");
+      //printf("Offset6, ");
       inject_offset6(&(inst[n_inst]), op->operands[i]->operand.imm);
     } else if (t & OPT_TRAPVECT8) {
-      printf("Trapvect8, ");
+      //printf("Trapvect8, ");
       inject_trapvect8(&(inst[n_inst]), op->operands[i]->operand.imm);
     } else if (t & OPT_PCOFFSET9) {
-      printf("Pcoffset9, ");
+      //printf("Pcoffset9, ");
       inject_pcoffset9(&(inst[n_inst]), op->operands[i]->operand.imm);
     } else if (t & OPT_PCOFFSET11) {
-      printf("Pcoffset11, ");
+      //printf("Pcoffset11, ");
       inject_pcoffset11(&(inst[n_inst]), op->operands[i]->operand.imm);
     } else {
       return -1;
     }
   }
 
-  printf("\n");
+  //printf("\n");
   return 1;
 }
 
