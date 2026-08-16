@@ -6,6 +6,7 @@
 
 #include "constants.h"
 
+// Offset and immediate value things
 #define GBOUND_INT16 32769
 #define BOUND_INT16 32768
 #define BOUND_INT11 1024
@@ -24,9 +25,42 @@
   ((const char *[]){"OPERAND_INVALID", "OPT_IMM16", "OPT_PCOFFSET11", \
                     "OPT_PCOFFSET9", "OPT_TRAPVECT8", "OPT_OFFSET6",  \
                     "OPT_IMM5"})
+
+// Shorthand matching
 #define OPT_IMM_OFFSET \
   (OPT_OFFSET6 | OPT_TRAPVECT8 | OPT_PCOFFSET9 | OPT_PCOFFSET11 | OPT_IMM16)
 #define OPT_REG (OPT_REG1 | OPT_REG2 | OPT_REG3)
+
+// Operand injections
+// 1. Mask operand to get into our n-bit format
+// 2. Shift operand to proper position if necessary (that's the magic numbers)
+// 3. Bitwise OR into the machine code
+static inline void inject_reg1(uint16_t *machine_code, int16_t operand) {
+  *machine_code |= (uint16_t)((operand & 0x7) << 9);
+}
+static inline void inject_reg2(uint16_t *machine_code, int16_t operand) {
+  *machine_code |= (uint16_t)((operand & 0x7) << 6);
+}
+static inline void inject_reg3(uint16_t *machine_code, int16_t operand) {
+  *machine_code |= (uint16_t)(operand & 0x7);
+}
+static inline void inject_imm5(uint16_t *machine_code, int16_t operand) {
+  // 0x20 because we have a preceeding 1 as the control bit for
+  // ADD and AND operations to differentiate between IMM5 and REG3
+  *machine_code |= (uint16_t)(0x20 | (operand & 0x1F));
+}
+static inline void inject_offset6(uint16_t *machine_code, int16_t operand) {
+  *machine_code |= (uint16_t)(operand & 0x3F);
+}
+static inline void inject_trapvect8(uint16_t *machine_code, int16_t operand) {
+  *machine_code |= (uint16_t)(operand & 0xFF);
+}
+static inline void inject_pcoffset9(uint16_t *machine_code, int16_t operand) {
+  *machine_code |= (uint16_t)(operand & 0x1FF);
+}
+static inline void inject_pcoffset11(uint16_t *machine_code, int16_t operand) {
+  *machine_code |= (uint16_t)(operand & 0x7FF);
+}
 
 typedef struct LabelMap LabelMap;
 struct LabelMap {

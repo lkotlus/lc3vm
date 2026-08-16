@@ -304,14 +304,15 @@ static void _print_directive(Directive *dir) {
 static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[],
                                int i) {
   Operation *op = line->line.operation;
+  inst[i] = opcode_map[op->opcode].machine_code;
 
   for (int i = 0; i < op->n_ops; ++i) {
     if (op->operands[i]->type == OPT_LAB) {
       _convert_label(line, labell, i);
+      if (op->err) return -1;
     }
   }
 
-  inst[i] = 0x0000;
   return 1;
 }
 
