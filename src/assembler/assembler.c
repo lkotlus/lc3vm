@@ -124,6 +124,7 @@ static int _second_pass(LineList *linel, LabelList *labell, uint16_t inst[]) {
 }
 
 static void _write_assembly(const char *fpath, uint16_t inst[], int words) {
+  strcat((char *)fpath, ".obj");
   FILE *file = fopen(fpath, "wb");
 
   if (!file) {
