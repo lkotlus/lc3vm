@@ -19,7 +19,7 @@ clean:
 	rm -rf $(BUILD_DIR) $(TARGET)
 
 format:
-	clang-format -i src/**/*.c src/**/*.h
+	clang-format -i src/*.c src/**/*.c src/*.h src/**/*.h
 
 valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./lc3vm -a test.asm test.asm

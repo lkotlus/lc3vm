@@ -10,6 +10,7 @@
 
 static int _first_pass(FILE *file, LabelList *labell, LineList *linel);
 static int _second_pass(LineList *linel, LabelList *labell, uint16_t inst[]);
+static void _write_assembly(const char *fpath, uint16_t inst[], int words);
 static LabelMap *_label_map_factory(char *label, uint16_t addr);
 static void _labell_push(LabelList *labell, LabelMap *lmap);
 static void _linel_push(LineList *linel, Line *line);
@@ -20,12 +21,12 @@ static void _free_directive(Directive *dir);
 static void _print_labell(LabelList *labell);
 static void _print_linel(LineList *linel);
 
-void assemble(const char *fpath) {
-  FILE *file = fopen(fpath, "r");
+void assemble(const char *ifpath, const char *ofpath) {
+  FILE *ifile = fopen(ifpath, "r");
   LabelList labell = {NULL, NULL};
   LineList linel = {NULL, NULL};
 
-  int words = _first_pass(file, &labell, &linel);
+  int words = _first_pass(ifile, &labell, &linel);
 
   if (words < 0) {
     printf("ENCOUNTERED ERRORS!\n");
@@ -46,7 +47,7 @@ void assemble(const char *fpath) {
 
     _free_labell(&labell);
     _free_linel(&linel);
-    fclose(file);
+    fclose(ifile);
 
     return;
   }
@@ -58,11 +59,13 @@ void assemble(const char *fpath) {
   printf("\n");
   _print_linel(&linel);
 
+  _write_assembly(ofpath, instructions, words);
+
   _free_labell(&labell);
   _free_linel(&linel);
   free(instructions);
 
-  fclose(file);
+  fclose(ifile);
 }
 
 static int _first_pass(FILE *file, LabelList *labell, LineList *linel) {
@@ -118,6 +121,25 @@ static int _second_pass(LineList *linel, LabelList *labell, uint16_t inst[]) {
   }
 
   return 0;
+}
+
+static void _write_assembly(const char *fpath, uint16_t inst[], int words) {
+  FILE *file = fopen(fpath, "wb");
+
+  if (!file) {
+    printf("Could not write to output file: %s\n", fpath);
+    return;
+  }
+
+  int bytes = (int)fwrite(inst, 1, words * 2, file);
+  if (bytes != words * 2) {
+    printf("Only able to write %d of %d bytes to output file.\n", bytes,
+           words * 2);
+    return;
+  }
+
+  printf("Successfully wrote assembled code to output file: %s\n", fpath);
+  fclose(file);
 }
 
 static LabelMap *_label_map_factory(char *label, uint16_t addr) {
