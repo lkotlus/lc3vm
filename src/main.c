@@ -101,33 +101,7 @@ CliFlags* parse_cliflags(int argv, char* args[]) {
 }
 
 void validate_path(const char* path, int create) {
-  if (create) {
-    printf("%s\n", path);
-    char pathcp_obj[STRLEN];
-    char pathcp_sym[STRLEN];
-
-    strncpy(pathcp_obj, path, STRLEN);
-    strncpy(pathcp_sym, path, STRLEN);
-
-    strcat(pathcp_obj, ".obj");
-    strcat(pathcp_sym, ".sym");
-
-    FILE* f1 = fopen(pathcp_obj, "w");
-    FILE *f2 = fopen(pathcp_sym, "w");
-
-    if (!f1) {
-      printf("Could not create output file: \"%s\"\n\n", pathcp_obj);
-      print_help();
-      exit(-1);
-    } else if (!f2) {
-      printf("Could not create output file: \"%s\"\n\n", pathcp_sym);
-      print_help();
-      exit(-1);
-    }
-
-    fclose(f1);
-    fclose(f2);
-  } else if (!(access(path, F_OK) == 0)) {
+  if (!create && !(access(path, F_OK) == 0)) {
     printf("File provided: \"%s\" does not exist.\n\n", path);
     print_help();
     exit(-1);

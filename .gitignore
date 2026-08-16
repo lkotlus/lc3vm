@@ -4,3 +4,5 @@ lc3vm
 .cache/
 .cache/*
 compile_commands.json
+*.obj
+*.sym

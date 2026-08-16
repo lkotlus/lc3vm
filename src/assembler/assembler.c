@@ -11,6 +11,7 @@
 static int _first_pass(FILE *file, LabelList *labell, LineList *linel);
 static int _second_pass(LineList *linel, LabelList *labell, uint16_t inst[]);
 static void _write_assembly(const char *fpath, uint16_t inst[], int words);
+static void _write_symtable(const char *fpath, LabelList *labell);
 static LabelMap *_label_map_factory(char *label, uint16_t addr);
 static void _labell_push(LabelList *labell, LabelMap *lmap);
 static void _linel_push(LineList *linel, Line *line);
@@ -60,6 +61,7 @@ void assemble(const char *ifpath, const char *ofpath) {
   _print_linel(&linel);
 
   _write_assembly(ofpath, instructions, words);
+  _write_symtable(ofpath, &labell);
 
   _free_labell(&labell);
   _free_linel(&linel);
@@ -124,8 +126,12 @@ static int _second_pass(LineList *linel, LabelList *labell, uint16_t inst[]) {
 }
 
 static void _write_assembly(const char *fpath, uint16_t inst[], int words) {
-  strcat((char *)fpath, ".obj");
-  FILE *file = fopen(fpath, "wb");
+  char fpathcp[STRLEN];
+  strncpy(fpathcp, fpath, STRLEN - 1);
+  fpathcp[STRLEN - 1] = '\0';
+  strcat(fpathcp, ".obj");
+
+  FILE *file = fopen(fpathcp, "wb");
 
   if (!file) {
     printf("Could not write to output file: %s\n", fpath);
@@ -139,7 +145,30 @@ static void _write_assembly(const char *fpath, uint16_t inst[], int words) {
     return;
   }
 
-  printf("Successfully wrote assembled code to output file: %s\n", fpath);
+  printf("Successfully wrote assembled code to output file: %s\n", fpathcp);
+  fclose(file);
+}
+
+static void _write_symtable(const char *fpath, LabelList *labell) {
+  char fpathcp[STRLEN];
+  strncpy(fpathcp, fpath, STRLEN - 1);
+  fpathcp[STRLEN - 1] = '\0';
+  strcat(fpathcp, ".sym");
+
+  FILE *file = fopen(fpathcp, "wb");
+  LabelMap *current = labell->head;
+
+  if (!file) {
+    printf("Could not write to output file: %s\n", fpath);
+    return;
+  }
+
+  while (current) {
+    fprintf(file, "%s\t0x%x\n", current->label, current->addr);
+    current = current->next;
+  }
+
+  printf("Successfully wrote assembled code to output file: %s\n", fpathcp);
   fclose(file);
 }
 
