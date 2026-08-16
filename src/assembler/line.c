@@ -302,17 +302,53 @@ static void _print_directive(Directive *dir) {
 }
 
 static int _assemble_operation(Line *line, LabelList *labell, uint16_t inst[],
-                               int i) {
+                               int n_inst) {
   Operation *op = line->line.operation;
-  inst[i] = opcode_map[op->opcode].machine_code;
+  inst[n_inst] = opcode_map[op->opcode].machine_code;
+  OperandType t;
+
+  printf("%s: ", opcode_map[op->opcode].token);
 
   for (int i = 0; i < op->n_ops; ++i) {
-    if (op->operands[i]->type == OPT_LAB) {
+    t = opcode_map[op->opcode].opspec.op_types[i];
+
+    if (t & OPT_LAB) {
       _convert_label(line, labell, i);
-      if (op->err) return -1;
+      if (op->err != OP_ERR_NONE) {
+        return -1;
+      }
+    } 
+
+    if (t & OPT_REG1) {
+      printf("Reg 1, ");
+      inject_reg1(&(inst[n_inst]), op->operands[i]->operand.imm);
+    } else if (t & OPT_REG2) {
+      printf("Reg 2, ");
+      inject_reg2(&(inst[n_inst]), op->operands[i]->operand.imm);
+    } else if (op->operands[i]->type & t & OPT_REG3) {
+      printf("Reg 3, ");
+      inject_reg3(&(inst[n_inst]), op->operands[i]->operand.imm);
+    } else if (t & OPT_IMM5) {
+      printf("Imm5, ");
+      inject_imm5(&(inst[n_inst]), op->operands[i]->operand.imm);
+    } else if (t & OPT_OFFSET6) {
+      printf("Offset6, ");
+      inject_offset6(&(inst[n_inst]), op->operands[i]->operand.imm);
+    } else if (t & OPT_TRAPVECT8) {
+      printf("Trapvect8, ");
+      inject_trapvect8(&(inst[n_inst]), op->operands[i]->operand.imm);
+    } else if (t & OPT_PCOFFSET9) {
+      printf("Pcoffset9, ");
+      inject_pcoffset9(&(inst[n_inst]), op->operands[i]->operand.imm);
+    } else if (t & OPT_PCOFFSET11) {
+      printf("Pcoffset11, ");
+      inject_pcoffset11(&(inst[n_inst]), op->operands[i]->operand.imm);
+    } else {
+      return -1;
     }
   }
 
+  printf("\n");
   return 1;
 }
 
@@ -337,10 +373,10 @@ static int _assemble_directive(Line *line, LabelList *labell, uint16_t inst[],
       }
       return dir->operand->operand.imm;
     case STRINGZ:
-      for (int j = 0; j < (int)strlen(dir->operand->operand.stringz); ++j) {
+      for (int j = 0; j <= (int)strlen(dir->operand->operand.stringz); ++j) {
         inst[i + j] = (uint16_t)dir->operand->operand.stringz[j];
       }
-      return strlen(dir->operand->operand.stringz);
+      return strlen(dir->operand->operand.stringz) + 1;
     case END:
       return 0;
     case DIRECTIVE_INVALID:
